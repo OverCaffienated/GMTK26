@@ -38,23 +38,26 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: BackWallpaper
+    uniqueID: 3223030053
+    locked: 0
+  - name: DeepBackground
+    uniqueID: 3234794859
+    locked: 0
+  - name: Background
+    uniqueID: 723721383
+    locked: 0
+  - name: RainBG
+    uniqueID: 265442665
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Ground
-    uniqueID: 4261574325
+  - name: RainFG
+    uniqueID: 2734069741
     locked: 0
-  - name: Wall
-    uniqueID: 2384673299
-    locked: 0
-  - name: Ledge
-    uniqueID: 1989842135
-    locked: 0
-  - name: Hazard
-    uniqueID: 1237155289
-    locked: 0
-  - name: Shadow
-    uniqueID: 1644873231
+  - name: Foreground
+    uniqueID: 2863732819
     locked: 0
   m_RenderingLayers:
   - Default
