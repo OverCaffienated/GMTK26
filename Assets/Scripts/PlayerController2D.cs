@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(PlayerSensors2D))]
 public class PlayerController2D : MonoBehaviour
 {
     [Header("References")]
@@ -18,7 +20,8 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float jumpCutMultiplier = 0.5f;
 
     [Header("Gravity")]
-    [SerializeField] public float baseGravity = 4f;
+    [SerializeField] private float baseGravity = 4f;
+    public float BaseGravity => baseGravity;
     [SerializeField] private float fallGravityMultiplier = 1.8f;
     [SerializeField] private float lowJumpGravityMultiplier = 1.4f;
     [SerializeField] private float maxFallSpeed = -20f;
@@ -36,9 +39,14 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float perfectJumpHorizontalBonus = 2.5f;
     [SerializeField] private float perfectJumpGroundRayLength = 1.2f;
 
+    [Header("Debug")]
+    [SerializeField] private bool logParry = true;
+
     public float MoveInput { get; private set; }
+    public bool JumpHeld { get; private set; }
     public bool JumpPressedThisFrame { get; private set; }
     public bool JumpReleasedThisFrame { get; private set; }
+    public bool ParryPressedThisFrame { get; private set; }
     public bool IsWallSliding { get; private set; }
     public int Facing => facing;
 
@@ -61,21 +69,21 @@ public class PlayerController2D : MonoBehaviour
 
     private void Update()
     {
-        ReadInput();
+        sensors.SetFacing(facing);
+        sensors.Tick();
 
-        if (MoveInput != 0)
-            facing = MoveInput > 0 ? 1 : -1;
-
-        if (sensors != null)
-        {
-            sensors.SetFacing(facing);
-            sensors.Tick();
-        }
-
+        UpdateFacing();
         UpdateTimers();
         UpdateWallSlideState();
         HandleJumpInput();
         HandleJumpCut();
+
+        if (ParryPressedThisFrame && logParry)
+            Debug.Log("Parry pressed");
+
+        JumpPressedThisFrame = false;
+        JumpReleasedThisFrame = false;
+        ParryPressedThisFrame = false;
     }
 
     private void FixedUpdate()
@@ -85,23 +93,26 @@ public class PlayerController2D : MonoBehaviour
         ApplyBetterGravity();
     }
 
-    private void ReadInput()
+    private void UpdateFacing()
     {
-        MoveInput = Input.GetAxisRaw("Horizontal");
-        JumpPressedThisFrame = Input.GetButtonDown("Jump");
-        JumpReleasedThisFrame = Input.GetButtonUp("Jump");
+        if (MoveInput > 0.01f)
+            facing = 1;
+        else if (MoveInput < -0.01f)
+            facing = -1;
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * facing;
+        transform.localScale = scale;
     }
 
     private void UpdateTimers()
     {
-        if (sensors != null && sensors.IsGrounded)
+        if (sensors.IsGrounded)
             coyoteCounter = coyoteTime;
         else
             coyoteCounter -= Time.deltaTime;
 
-        if (JumpPressedThisFrame)
-            jumpBufferCounter = jumpBufferTime;
-        else
+        if (jumpBufferCounter > 0f)
             jumpBufferCounter -= Time.deltaTime;
 
         if (wallJumpLockCounter > 0f)
@@ -113,10 +124,11 @@ public class PlayerController2D : MonoBehaviour
 
     private void UpdateWallSlideState()
     {
-        bool pushingIntoWall = (MoveInput > 0 && facing == 1) || (MoveInput < 0 && facing == -1);
+        bool pushingIntoWall =
+            (MoveInput > 0.01f && facing == 1) ||
+            (MoveInput < -0.01f && facing == -1);
 
         IsWallSliding =
-            sensors != null &&
             !sensors.IsGrounded &&
             sensors.IsTouchingWall &&
             rb.linearVelocity.y < 0f &&
@@ -152,7 +164,7 @@ public class PlayerController2D : MonoBehaviour
         if (wallJumpLockCounter > 0f)
             return;
 
-        float control = sensors != null && sensors.IsGrounded ? 1f : airControl;
+        float control = sensors.IsGrounded ? 1f : airControl;
         rb.linearVelocity = new Vector2(MoveInput * moveSpeed * control, rb.linearVelocity.y);
     }
 
@@ -190,6 +202,7 @@ public class PlayerController2D : MonoBehaviour
         jumpBufferCounter = 0f;
         coyoteCounter = 0f;
         IsWallSliding = false;
+        JumpHeld = true;
     }
 
     private bool IsPerfectEdgeJump(out float horizontalBonus, out float verticalBonus)
@@ -197,10 +210,13 @@ public class PlayerController2D : MonoBehaviour
         horizontalBonus = 0f;
         verticalBonus = 0f;
 
-        if (sensors == null)
-            return false;
+        RaycastHit2D groundHit = Physics2D.Raycast(
+            transform.position,
+            Vector2.down,
+            perfectJumpGroundRayLength,
+            sensors.groundLayer
+        );
 
-        RaycastHit2D groundHit = Physics2D.Raycast(transform.position, Vector2.down, perfectJumpGroundRayLength, sensors.groundLayer);
         if (!groundHit.collider)
             return false;
 
@@ -223,34 +239,42 @@ public class PlayerController2D : MonoBehaviour
         rb.gravityScale = baseGravity;
 
         if (rb.linearVelocity.y < 0f)
-        {
             rb.gravityScale = baseGravity * fallGravityMultiplier;
-        }
-        else if (rb.linearVelocity.y > 0f && !Input.GetButton("Jump"))
-        {
+        else if (rb.linearVelocity.y > 0f && !JumpHeld)
             rb.gravityScale = baseGravity * lowJumpGravityMultiplier;
-        }
 
         if (rb.linearVelocity.y < maxFallSpeed)
-        {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
-        }
     }
 
-    public void SetExternalVelocity(Vector2 velocity)
+    public void OnMove(InputValue value)
     {
-        rb.linearVelocity = velocity;
+        Vector2 input = value.Get<Vector2>();
+        MoveInput = input.x;
+        Debug.Log("Move input = " + input);
     }
 
-    public void SetGravityEnabled(bool enabled)
+    public void OnJump(InputValue value)
     {
-        rb.gravityScale = enabled ? baseGravity : 0f;
+        if (!value.isPressed)
+            return;
+
+        JumpHeld = true;
+        JumpPressedThisFrame = true;
+        jumpBufferCounter = jumpBufferTime;
     }
 
-    public void SetLocked(bool locked)
+    public void OnJumpRelease(InputValue value)
     {
-        enabled = !locked;
-        if (locked)
-            rb.linearVelocity = Vector2.zero;
+        JumpHeld = false;
+        JumpReleasedThisFrame = true;
+    }
+
+    public void OnParry(InputValue value)
+    {
+        if (!value.isPressed)
+            return;
+
+        ParryPressedThisFrame = true;
     }
 }

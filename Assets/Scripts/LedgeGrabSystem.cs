@@ -88,7 +88,7 @@ public class LedgeGrabSystem : MonoBehaviour
             yield return null;
         }
 
-        rb.gravityScale = controller.baseGravity;
+        rb.gravityScale = controller.BaseGravity;
         stateMachine.SetState(PlayerState.Airborne);
 
         canGrab = false;

@@ -52,7 +52,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Jump Released",
+                    "name": "JumpReleased",
                     "type": "Button",
                     "id": "a40d2ce3-b0a4-44fa-9b2f-9eeca31af698",
                     "expectedControlType": "",
@@ -364,7 +364,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Jump Released",
+                    "action": "JumpReleased",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -375,7 +375,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Jump Released",
+                    "action": "JumpReleased",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -386,17 +386,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Jump Released",
+                    "action": "JumpReleased",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "109b4d06-e701-4d5b-94bb-97ff10e99763",
-                    "path": "",
+                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard&Mouse",
                     "action": "Parry",
                     "isComposite": false,
                     "isPartOfComposite": false
