@@ -256,12 +256,17 @@ public class PlayerController2D : MonoBehaviour
 
     public void OnJump(InputValue value)
     {
-        if (!value.isPressed)
-            return;
-
-        JumpHeld = true;
-        JumpPressedThisFrame = true;
-        jumpBufferCounter = jumpBufferTime;
+        if (value.isPressed)
+        {
+            JumpHeld = true;
+            JumpPressedThisFrame = true;
+            jumpBufferCounter = jumpBufferTime;
+        }
+        else
+        {
+            JumpHeld = false;
+            JumpReleasedThisFrame = true;
+        }
     }
 
     public void OnJumpRelease(InputValue value)
