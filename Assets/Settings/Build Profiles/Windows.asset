@@ -34,6 +34,12 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Scenes/GuillotineDeathScene.unity
     m_guid: 7c2a6fe1f4e343043b4dd04993eee4a5
+  - m_enabled: 1
+    m_path: Assets/Scenes/IntroCutscene.unity
+    m_guid: 97d568acec78d8a46b7824201e88c876
+  - m_enabled: 1
+    m_path: Assets/Scenes/EndCutscene.unity
+    m_guid: f9d80e713de4dd34aa6cd0075e7ea274
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:

@@ -17,5 +17,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PermanentDeathScene.unity
     guid: d49e41f2f0fdf31449062a268a2bbf6e
+  - enabled: 1
+    path: Assets/Scenes/IntroCutscene.unity
+    guid: 97d568acec78d8a46b7824201e88c876
+  - enabled: 1
+    path: Assets/Scenes/EndCutscene.unity
+    guid: f9d80e713de4dd34aa6cd0075e7ea274
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
