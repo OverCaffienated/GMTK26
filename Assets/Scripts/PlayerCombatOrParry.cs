@@ -13,10 +13,12 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     [Header("Parry Settings")]
     [SerializeField] private float parryDuration = 0.2f;
+    [SerializeField] private float parryCooldown = 5.0f;
     [SerializeField] private float parryPushbackDistance = 0.3f;
     [SerializeField] private GameObject parryEffectPrefab;
     private bool isParryActive = false;
     private float parryTimer = 0f;
+    private float nextParryTime = 0f;
 
     [Header("Attack Settings")]
     [SerializeField] private Transform attackPoint;
@@ -28,14 +30,16 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     [Header("Player Animations")]
     [SerializeField] private Animator anim;
-    [SerializeField] private string attackAnimationName = "YourAttackAnimNameHere";
-    [SerializeField] private string parryAnimationName = "YourParryAnimNameHere";
+    [SerializeField] private string attackAnimationName = "SwordSlashAnim"; // Type your exact state name in the Inspector
+    [SerializeField] private string parryAnimationName = "ParryClip";       // Type your exact state name in the Inspector
+    [SerializeField] private string idleAnimationName = "Idle";             // So we can return to idle via code
 
     private float nextAttackTime = 0f;
 
     public bool IsParryActive => isParryActive;
-    public bool CanParry => !isParryActive;
+    public bool CanParry => Time.time >= nextParryTime && !isParryActive;
     public int CurrentLives => currentLives;
+
     private void Start()
     {
         currentLives = maxLives;
@@ -58,9 +62,10 @@ public class PlayerCombatOrParry : MonoBehaviour
         if (Keyboard.current != null && (Keyboard.current.kKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame))
             parryInput = true;
 
-        if (parryInput && !isParryActive)
+        if (parryInput && CanParry)
         {
             StartCoroutine(ActivateParryWindow());
+            nextParryTime = Time.time + parryCooldown;
         }
     }
 
@@ -86,6 +91,7 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     private IEnumerator AttackRoutine()
     {
+        // 1. Force the attack animation to play via string name
         if (anim != null && !string.IsNullOrEmpty(attackAnimationName))
         {
             anim.Play(attackAnimationName, -1, 0f);
@@ -108,10 +114,17 @@ public class PlayerCombatOrParry : MonoBehaviour
 
         yield return new WaitForSeconds(attackCooldown);
         if (attackVisualObject != null) attackVisualObject.SetActive(false);
+
+        // Return to Idle when done
+        if (anim != null && !string.IsNullOrEmpty(idleAnimationName))
+        {
+            anim.Play(idleAnimationName);
+        }
     }
 
     private IEnumerator ActivateParryWindow()
     {
+        // 1. Force the parry animation to play via string name
         if (anim != null && !string.IsNullOrEmpty(parryAnimationName))
         {
             anim.Play(parryAnimationName, -1, 0f);
@@ -127,6 +140,17 @@ public class PlayerCombatOrParry : MonoBehaviour
         }
 
         isParryActive = false;
+
+        // Return to Idle when done
+        if (anim != null && !string.IsNullOrEmpty(idleAnimationName))
+        {
+            anim.Play(idleAnimationName);
+        }
+    }
+
+    public void ResetParryCooldown()
+    {
+        nextParryTime = 0f;
     }
 
     public void TriggerParryEffect()

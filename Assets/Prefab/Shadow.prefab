@@ -227,6 +227,9 @@ MonoBehaviour:
   glintParticle: {fileID: 108607401307674507}
   attackHitboxObject: {fileID: 7929194758790608505}
   permanentDeathSceneName: GuillotineDeathScene
+  idleAnimName: DeathPreppingAttack_0
+  bodyAttackAnimName: ReaperAttack
+  clockAttackAnimName: ReaperWeaponAttack
   delaySeconds: 0.5
   baseMoveSpeed: 2
   attackTriggerDistance: 2.5
@@ -235,6 +238,7 @@ MonoBehaviour:
   hoverOffsetY: 1
   hoverOffsetX: 1
   flipInterval: 2
+  totalAttackDuration: 4
   parryWindowDuration: 0.3
 --- !u!1 &5705891323285715865
 GameObject:
@@ -351,7 +355,6 @@ GameObject:
   m_Component:
   - component: {fileID: 882028378329462640}
   - component: {fileID: 3735076988033378566}
-  - component: {fileID: 6407305791226343793}
   - component: {fileID: 7770854581347136628}
   - component: {fileID: 7500144400811027218}
   m_Layer: 0
@@ -437,19 +440,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
---- !u!114 &6407305791226343793
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7929194758790608505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13d4d58bfdc7ec147a0b4875467633ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
-  damageAmount: 100
 --- !u!95 &7770854581347136628
 Animator:
   serializedVersion: 7

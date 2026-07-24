@@ -12,6 +12,9 @@ public class PlayerController2D : MonoBehaviour
 
     [Header("Animation & Visuals")]
     [SerializeField] private Animator anim;
+    [SerializeField] private string idleAnimationName = "Idle_Clip"; // Type the exact state name in the Inspector
+    [SerializeField] private string runAnimationName = "Run_Clip";   // Type the exact state name in the Inspector
+    [SerializeField] private string jumpAnimationName = "Jump_Clip"; // Type the exact state name in the Inspector
     [SerializeField] private Transform visualRoot;
     [SerializeField] private ParticleSystem runTrail;
     [SerializeField] private float maxLeanAngle = 10f;
@@ -208,21 +211,26 @@ public class PlayerController2D : MonoBehaviour
 
     private void UpdateAnimations()
     {
+        // Now using string names to force play the animations directly!
         if (anim == null) return;
+
+        // IMPORTANT: Prevent movement animations from overriding Combat/Parry animations
+        PlayerCombatOrParry combat = GetComponent<PlayerCombatOrParry>();
+        if (combat != null && combat.IsParryActive) return;
 
         if (!sensors.IsGrounded)
         {
-            anim.Play("Jump");
+            if (!string.IsNullOrEmpty(jumpAnimationName)) anim.Play(jumpAnimationName);
             if (runTrail != null) runTrail.Stop();
         }
         else if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
         {
-            anim.Play("Run");
+            if (!string.IsNullOrEmpty(runAnimationName)) anim.Play(runAnimationName);
             if (runTrail != null && !runTrail.isPlaying) runTrail.Play();
         }
         else
         {
-            anim.Play("Idle");
+            if (!string.IsNullOrEmpty(idleAnimationName)) anim.Play(idleAnimationName);
             if (runTrail != null) runTrail.Stop();
         }
     }
@@ -269,7 +277,6 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
-    // --- NEW METHOD FOR ENDING TRIGGERS --- //
     public void SetMoveSpeed(float newSpeed)
     {
         moveSpeed = newSpeed;

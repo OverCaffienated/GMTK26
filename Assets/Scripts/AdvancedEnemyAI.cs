@@ -186,7 +186,7 @@ public class AdvancedEnemyAI : MonoBehaviour
 
         if (currentMoveDirection == 1)
         {
-            transform.position = Vector2.MoveTowards(transform.position, new Vector2(player.transform.position.x, transform.position.y), actualSpeedToMove * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, new Vector2(player.transform.position.x, player.transform.position.y), actualSpeedToMove * Time.deltaTime);
             if (anim != null && !string.IsNullOrEmpty(runAnimName)) anim.Play(runAnimName, -1, 0f);
             ApplyLeaning(actualSpeedToMove);
         }
@@ -277,6 +277,7 @@ public class AdvancedEnemyAI : MonoBehaviour
 
         pc.TriggerParryEffect();
         pc.ApplyParryPushback(transform.position);
+        pc.ResetParryCooldown();
 
         StopAllCoroutines();
         StartCoroutine(StunRoutine());

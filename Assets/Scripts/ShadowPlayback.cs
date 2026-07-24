@@ -8,20 +8,26 @@ public class ShadowPlayback : MonoBehaviour
     [SerializeField] private Animator shadowAnim;
     [SerializeField] private GameObject glintParticle;
     [SerializeField] private GameObject attackHitboxObject;
-    [SerializeField] private string permanentDeathSceneName = "PermanentDeathScene";
+    [SerializeField] private string permanentDeathSceneName = "GuillotineDeathScene";
 
-    [Header("Shadow Settings")]
+    [Header("Shadow Animations (Exact Names)")]
+    [SerializeField] private string idleAnimName = "DeathPreppingAttack_0";
+    [SerializeField] private string bodyAttackAnimName = "ReaperAttack";
+    [SerializeField] private string clockAttackAnimName = "ReaperWeaponAttack";
+
+    [Header("Shadow Movement Settings")]
     public float delaySeconds = 8f;
-    [SerializeField] private float baseMoveSpeed = 4f;
-    [SerializeField] private float attackTriggerDistance = 0.5f;
-    [SerializeField] private float attackCooldown = 4f;
-    [SerializeField] private float pushBackDistance = 3f;
-    [SerializeField] private float hoverOffsetY = 2.0f;
-    [SerializeField] private float hoverOffsetX = 2.0f;
-    [SerializeField] private float flipInterval = 2.0f;
+    [SerializeField] private float baseMoveSpeed = 2f;
+    [SerializeField] private float attackTriggerDistance = 2.5f;
+    [SerializeField] private float attackCooldown = 6f;
+    [SerializeField] private float pushBackDistance = 15f;
+    [SerializeField] private float hoverOffsetY = 1.0f;
+    [SerializeField] private float hoverOffsetX = 1.0f;
+    [SerializeField] private float flipInterval = 2f;
 
-    [Header("Attack Timing Config")]
-    [SerializeField] private float parryWindowDuration = 0.25f;
+    [Header("Attack Timings (Zilean Bomb Style)")]
+    [SerializeField] private float totalAttackDuration = 4.0f;
+    [SerializeField] private float parryWindowDuration = 1.0f;
 
     private bool isAttacking = false;
     private bool canBeParriedNow = false;
@@ -41,6 +47,11 @@ public class ShadowPlayback : MonoBehaviour
             defaultHitboxLocalPos = attackHitboxObject.transform.localPosition;
         }
 
+        if (shadowAnim != null && !string.IsNullOrEmpty(idleAnimName))
+        {
+            shadowAnim.Play(idleAnimName, -1, 0f);
+        }
+
         Collider2D shadowCol = GetComponent<Collider2D>();
         Collider2D playerCol = player != null ? player.GetComponent<Collider2D>() : null;
         if (shadowCol != null && playerCol != null)
@@ -52,6 +63,8 @@ public class ShadowPlayback : MonoBehaviour
     private void Update()
     {
         if (player == null) return;
+
+        if (Time.timeSinceLevelLoad < delaySeconds) return;
 
         attackTimer += Time.deltaTime;
         flipTimer += Time.deltaTime;
@@ -67,8 +80,23 @@ public class ShadowPlayback : MonoBehaviour
         float sideOffset = shadowPos2D.x >= playerPos2D.x ? hoverOffsetX : -hoverOffsetX;
         Vector2 targetPos2D = new Vector2(playerPos2D.x + sideOffset, playerPos2D.y + hoverOffsetY);
 
+        if (canBeParriedNow)
+        {
+            PlayerCombatOrParry playerCombat = player.GetComponent<PlayerCombatOrParry>();
+            if (playerCombat != null && playerCombat.IsParryActive)
+            {
+                SuccessfulParry();
+                return;
+            }
+        }
+
         if (!isAttacking)
         {
+            if (shadowAnim != null && !string.IsNullOrEmpty(idleAnimName))
+            {
+                shadowAnim.Play(idleAnimName, -1, 0f);
+            }
+
             if (glintParticle != null && glintParticle.activeSelf) glintParticle.SetActive(false);
             if (attackHitboxObject != null && attackHitboxObject.activeSelf)
             {
@@ -95,20 +123,11 @@ public class ShadowPlayback : MonoBehaviour
                 }
                 flipTimer = 0f;
             }
-        }
 
-        float distanceToTarget = Vector2.Distance(shadowPos2D, targetPos2D);
-        if (distanceToTarget <= attackTriggerDistance && attackTimer >= attackCooldown && !isAttacking)
-        {
-            StartCoroutine(ShadowAttackRoutine());
-        }
-
-        if (canBeParriedNow)
-        {
-            PlayerCombatOrParry playerCombat = player.GetComponent<PlayerCombatOrParry>();
-            if (playerCombat != null && playerCombat.IsParryActive)
+            float distanceToTarget = Vector2.Distance(shadowPos2D, targetPos2D);
+            if (distanceToTarget <= attackTriggerDistance && attackTimer >= attackCooldown)
             {
-                SuccessfulParry();
+                StartCoroutine(ShadowAttackRoutine());
             }
         }
     }
@@ -123,29 +142,51 @@ public class ShadowPlayback : MonoBehaviour
         isAttacking = true;
         attackTimer = 0f;
 
-        float xDiff = player.transform.position.x - transform.position.x;
-        if (Mathf.Abs(xDiff) > 0.05f)
+        if (shadowAnim != null && !string.IsNullOrEmpty(bodyAttackAnimName))
         {
-            Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x) * (int)Mathf.Sign(xDiff);
-            transform.localScale = scale;
-        }
-        flipTimer = 0f;
-
-        if (shadowAnim != null)
-        {
-            shadowAnim.Play("clockreaperbloodattack", -1, 0f);
+            shadowAnim.Play(bodyAttackAnimName, -1, 0f);
         }
 
-        if (attackHitboxObject != null) attackHitboxObject.SetActive(true);
-
-        float totalAttackTime = 1.367f;
-        float windupTime = totalAttackTime - parryWindowDuration;
+        float bodyAnimLeadIn = 0.8f;
         float elapsed = 0f;
 
-        while (elapsed < windupTime)
+        while (elapsed < bodyAnimLeadIn)
         {
             elapsed += Time.deltaTime;
+            Vector2 shadowPos2D = new Vector2(transform.position.x, transform.position.y);
+            Vector2 playerPos2D = new Vector2(player.transform.position.x, player.transform.position.y);
+            float sideOffset = shadowPos2D.x >= playerPos2D.x ? hoverOffsetX : -hoverOffsetX;
+            Vector2 targetPos2D = new Vector2(playerPos2D.x + sideOffset, playerPos2D.y + hoverOffsetY);
+            transform.position = Vector2.MoveTowards(shadowPos2D, targetPos2D, baseMoveSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        if (attackHitboxObject != null)
+        {
+            attackHitboxObject.SetActive(true);
+            Animator clockAnim = attackHitboxObject.GetComponent<Animator>();
+            if (clockAnim != null && !string.IsNullOrEmpty(clockAttackAnimName))
+            {
+                clockAnim.Play(clockAttackAnimName, -1, 0f);
+            }
+        }
+
+        float clockActiveDuration = totalAttackDuration - bodyAnimLeadIn;
+        float warningTime = clockActiveDuration - parryWindowDuration;
+        if (warningTime < 0f) warningTime = 0f;
+
+        elapsed = 0f;
+
+        while (elapsed < warningTime)
+        {
+            elapsed += Time.deltaTime;
+
+            Vector2 shadowPos2D = new Vector2(transform.position.x, transform.position.y);
+            Vector2 playerPos2D = new Vector2(player.transform.position.x, player.transform.position.y);
+            float sideOffset = shadowPos2D.x >= playerPos2D.x ? hoverOffsetX : -hoverOffsetX;
+            Vector2 targetPos2D = new Vector2(playerPos2D.x + sideOffset, playerPos2D.y + hoverOffsetY);
+            transform.position = Vector2.MoveTowards(shadowPos2D, targetPos2D, baseMoveSpeed * Time.deltaTime);
+
             if (attackHitboxObject != null)
             {
                 attackHitboxObject.transform.position = player.transform.position;
@@ -178,15 +219,12 @@ public class ShadowPlayback : MonoBehaviour
 
         if (isAttacking)
         {
-            TriggerPermanentDeath();
+            UnityEngine.SceneManagement.SceneManager.LoadScene(permanentDeathSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+            Time.timeScale = 0f;
         }
 
         isAttacking = false;
-
-        if (shadowAnim != null)
-        {
-            shadowAnim.Play("DeathPreppingAttack_0", -1, 0f);
-        }
+        StartCoroutine(ParryFadeAndTeleportRoutine(delaySeconds));
     }
 
     private void SuccessfulParry()
@@ -203,6 +241,7 @@ public class ShadowPlayback : MonoBehaviour
         if (playerCombat != null)
         {
             playerCombat.TriggerParryEffect();
+            playerCombat.ResetParryCooldown();
         }
 
         StopAllCoroutines();
@@ -227,10 +266,9 @@ public class ShadowPlayback : MonoBehaviour
 
     private IEnumerator ParryFadeAndTeleportRoutine(float timeToBuy)
     {
-        // ANIMATION RESET: Instantly reverts to the default pose while it fades out and teleports
-        if (shadowAnim != null)
+        if (shadowAnim != null && !string.IsNullOrEmpty(idleAnimName))
         {
-            shadowAnim.Play("DeathPreppingAttack_0", -1, 0f);
+            shadowAnim.Play(idleAnimName, -1, 0f);
         }
 
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
@@ -277,10 +315,5 @@ public class ShadowPlayback : MonoBehaviour
 
         isAttacking = false;
         attackTimer = 0f;
-    }
-
-    private void TriggerPermanentDeath()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(permanentDeathSceneName);
     }
 }

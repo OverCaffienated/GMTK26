@@ -7,6 +7,7 @@ public class GuillotineManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameObject glintObject;
+    [SerializeField] private Animator guillotineAnimator;
     [SerializeField] private string gameplaySceneName = "MainGame";
     [SerializeField] private string permanentDeathSceneName = "PermanentDeathScene";
 
@@ -20,6 +21,12 @@ public class GuillotineManager : MonoBehaviour
     private void Start()
     {
         if (glintObject != null) glintObject.SetActive(false);
+
+        if (guillotineAnimator != null)
+        {
+            guillotineAnimator.SetTrigger("Fall");
+        }
+
         StartCoroutine(GuillotineSequence());
     }
 
@@ -36,23 +43,25 @@ public class GuillotineManager : MonoBehaviour
 
     private IEnumerator GuillotineSequence()
     {
+
         float randomDelay = Random.Range(totalDuration - 1.8f, totalDuration - 0.8f);
-        yield return new WaitForSeconds(Mathf.Max(0.5f, randomDelay));
+        yield return new WaitForSecondsRealtime(Mathf.Max(0.5f, randomDelay));
 
         canParryNow = true;
         if (glintObject != null) glintObject.SetActive(true);
 
-        yield return new WaitForSeconds(glintWindowDuration);
+        yield return new WaitForSecondsRealtime(glintWindowDuration);
 
         canParryNow = false;
         if (glintObject != null) glintObject.SetActive(false);
 
         float remainingTime = totalDuration - randomDelay - glintWindowDuration;
-        if (remainingTime > 0f) yield return new WaitForSeconds(remainingTime);
+        if (remainingTime > 0f) yield return new WaitForSecondsRealtime(remainingTime);
 
         if (!sequenceEnded)
         {
             sequenceEnded = true;
+            Time.timeScale = 1f;
             SceneManager.LoadScene(permanentDeathSceneName);
         }
     }
@@ -62,6 +71,20 @@ public class GuillotineManager : MonoBehaviour
         sequenceEnded = true;
         if (glintObject != null) glintObject.SetActive(false);
 
-        SceneManager.LoadScene(gameplaySceneName);
+        Time.timeScale = 1f;
+
+        PlayerCombatOrParry playerCombat = FindAnyObjectByType<PlayerCombatOrParry>();
+        if (playerCombat != null)
+        {
+
+        }
+
+        ShadowPlayback shadow = FindAnyObjectByType<ShadowPlayback>();
+        if (shadow != null)
+        {
+            shadow.ApplyGuillotineRespawn();
+        }
+
+        SceneManager.UnloadSceneAsync("GuillotineDeathScene");
     }
 }
