@@ -1,19 +1,22 @@
 fileFormatVersion: 2
-guid: c284228e9e90f524daff44380a6425e4
+guid: 1b1e545dde04f31428a35c5e7d9ddadb
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 579183020363392503
-    second: ParryVFX_0
+      213: -1974291539768581992
+    second: ParryAnimation_0
   - first:
-      213: 1288155454348580671
-    second: ParryVFX_1
+      213: -4638234199413544119
+    second: ParryAnimation_1
   - first:
-      213: -442484823804437707
-    second: ParryVFX_2
+      213: -2579279937716714867
+    second: ParryAnimation_2
   - first:
-      213: -8280922189642524740
-    second: ParryVFX_3
+      213: -3041375043429630703
+    second: ParryAnimation_3
+  - first:
+      213: 827372579972203854
+    second: ParryAnimation_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -55,12 +58,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -122,89 +125,111 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ParryVFX_0
+      name: ParryAnimation_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 51
-        width: 26
-        height: 18
+        x: 0
+        y: 512
+        width: 256
+        height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7f5a2bc63eba90800800000000000000
-      internalID: 579183020363392503
+      spriteID: 890e8090e48e994e0800000000000000
+      internalID: -1974291539768581992
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ParryVFX_1
+      name: ParryAnimation_1
       rect:
         serializedVersion: 2
-        x: 27
-        y: 47
-        width: 94
-        height: 78
+        x: 256
+        y: 512
+        width: 256
+        height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f37ddef8f8270e110800000000000000
-      internalID: 1288155454348580671
+      spriteID: 94b23eee19ea1afb0800000000000000
+      internalID: -4638234199413544119
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ParryVFX_2
+      name: ParryAnimation_2
       rect:
         serializedVersion: 2
-        x: 23
-        y: 7
-        width: 22
-        height: 22
+        x: 0
+        y: 256
+        width: 256
+        height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 53b92aaa56afbd9f0800000000000000
-      internalID: -442484823804437707
+      spriteID: d828a10ff8e843cd0800000000000000
+      internalID: -2579279937716714867
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ParryVFX_3
+      name: ParryAnimation_3
       rect:
         serializedVersion: 2
-        x: 55
-        y: 3
-        width: 58
-        height: 34
+        x: 256
+        y: 256
+        width: 256
+        height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cb715b98421441d80800000000000000
-      internalID: -8280922189642524740
+      spriteID: 11d73ab038ddac5d0800000000000000
+      internalID: -3041375043429630703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParryAnimation_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4544265afa6b7b00800000000000000
+      internalID: 827372579972203854
       vertices: []
       indices: 
       edges: []
@@ -213,7 +238,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 24bdf81c4f134ad4a869ef82e9a81d49
     internalID: 0
     vertices: []
     indices: 
@@ -221,12 +246,15 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":256.0,"y":256.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      ParryVFX_0: 579183020363392503
-      ParryVFX_1: 1288155454348580671
-      ParryVFX_2: -442484823804437707
-      ParryVFX_3: -8280922189642524740
+      ParryAnimation_0: -1974291539768581992
+      ParryAnimation_1: -4638234199413544119
+      ParryAnimation_2: -2579279937716714867
+      ParryAnimation_3: -3041375043429630703
+      ParryAnimation_4: 827372579972203854
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

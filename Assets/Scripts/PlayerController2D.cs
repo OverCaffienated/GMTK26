@@ -268,4 +268,10 @@ public class PlayerController2D : MonoBehaviour
             JumpReleasedThisFrame = true;
         }
     }
+
+    // --- NEW METHOD FOR ENDING TRIGGERS --- //
+    public void SetMoveSpeed(float newSpeed)
+    {
+        moveSpeed = newSpeed;
+    }
 }

@@ -25,8 +25,8 @@ public class GuillotineManager : MonoBehaviour
 
     private void Update()
     {
-        bool parryPressed = (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) ||
-                            (Keyboard.current != null && (Keyboard.current.jKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame));
+        bool parryPressed = (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame) ||
+                            (Keyboard.current != null && (Keyboard.current.kKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame));
 
         if (canParryNow && !sequenceEnded && parryPressed)
         {

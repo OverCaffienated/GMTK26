@@ -231,7 +231,7 @@ MonoBehaviour:
   gameplaySceneName: MainGame
   permanentDeathSceneName: PermanentDeathScene
   totalDuration: 2.33
-  glintWindowDuration: 0.4
+  glintWindowDuration: 2
 --- !u!4 &231513942
 Transform:
   m_ObjectHideFlags: 0
@@ -449,7 +449,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -258.04, y: 0}
+  m_AnchoredPosition: {x: -190, y: -13}
   m_SizeDelta: {x: 598.9153, y: 598}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1724213873
@@ -539,14 +539,14 @@ RectTransform:
   m_GameObject: {fileID: 1999683740}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2145160630}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -308, y: -194}
+  m_AnchoredPosition: {x: -259, y: -135}
   m_SizeDelta: {x: 43.6624, y: 43.6624}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1999683742
@@ -569,7 +569,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5455608841751904411, guid: fc99ace3bc171c142b8dde83c43f2722, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fc99ace3bc171c142b8dde83c43f2722, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
