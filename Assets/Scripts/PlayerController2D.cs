@@ -18,10 +18,10 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float coyoteTime = 0.1f;
     [SerializeField] private float jumpBufferTime = 0.1f;
     [SerializeField] private float jumpCutMultiplier = 0.5f;
+    [SerializeField] private float jumpCooldown = 0.05f;
 
     [Header("Gravity")]
     [SerializeField] private float baseGravity = 4f;
-    public float BaseGravity => baseGravity;
     [SerializeField] private float fallGravityMultiplier = 1.8f;
     [SerializeField] private float lowJumpGravityMultiplier = 1.4f;
     [SerializeField] private float maxFallSpeed = -20f;
@@ -33,20 +33,10 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float wallJumpLockTime = 0.15f;
     [SerializeField] private float wallRegrabBlockTime = 0.12f;
 
-    [Header("Perfect Jump")]
-    [SerializeField] private float perfectJumpDistance = 0.18f;
-    [SerializeField] private float perfectJumpVerticalBonus = 1.5f;
-    [SerializeField] private float perfectJumpHorizontalBonus = 2.5f;
-    [SerializeField] private float perfectJumpGroundRayLength = 1.2f;
-
-    [Header("Debug")]
-    [SerializeField] private bool logParry = true;
-
     public float MoveInput { get; private set; }
     public bool JumpHeld { get; private set; }
     public bool JumpPressedThisFrame { get; private set; }
     public bool JumpReleasedThisFrame { get; private set; }
-    public bool ParryPressedThisFrame { get; private set; }
     public bool IsWallSliding { get; private set; }
     public int Facing => facing;
 
@@ -54,6 +44,7 @@ public class PlayerController2D : MonoBehaviour
     private float jumpBufferCounter;
     private float wallJumpLockCounter;
     private float wallRegrabBlockCounter;
+    private float jumpCooldownCounter;
     private int facing = 1;
 
     private void Awake()
@@ -69,30 +60,44 @@ public class PlayerController2D : MonoBehaviour
 
     private void Update()
     {
+        if (GameStateManager.Instance != null && GameStateManager.Instance.GameplayLocked)
+        {
+            MoveInput = 0f;
+            JumpHeld = false;
+            JumpPressedThisFrame = false;
+            JumpReleasedThisFrame = false;
+            return;
+        }
+
+        UpdateFacing();
         sensors.SetFacing(facing);
         sensors.Tick();
 
-        UpdateFacing();
         UpdateTimers();
         UpdateWallSlideState();
         HandleJumpInput();
         HandleJumpCut();
 
-        if (ParryPressedThisFrame && logParry)
-            Debug.Log("Parry pressed");
-
         JumpPressedThisFrame = false;
         JumpReleasedThisFrame = false;
-        ParryPressedThisFrame = false;
+
+        //Debug.Log($"Grounded={sensors.IsGrounded}, VelY={rb.linearVelocity.y}, Coyote={coyoteCounter}, Buffer={jumpBufferCounter}");
     }
 
     private void FixedUpdate()
     {
+        if (GameStateManager.Instance != null && GameStateManager.Instance.GameplayLocked)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
+
         ApplyHorizontalMovement();
         ApplyWallSlide();
         ApplyBetterGravity();
     }
 
+   
     private void UpdateFacing()
     {
         if (MoveInput > 0.01f)
@@ -104,10 +109,11 @@ public class PlayerController2D : MonoBehaviour
         scale.x = Mathf.Abs(scale.x) * facing;
         transform.localScale = scale;
     }
+   
 
     private void UpdateTimers()
     {
-        if (sensors.IsGrounded)
+        if (sensors.IsGrounded && rb.linearVelocity.y <= 0.05f)
             coyoteCounter = coyoteTime;
         else
             coyoteCounter -= Time.deltaTime;
@@ -120,13 +126,16 @@ public class PlayerController2D : MonoBehaviour
 
         if (wallRegrabBlockCounter > 0f)
             wallRegrabBlockCounter -= Time.deltaTime;
+
+        if (jumpCooldownCounter > 0f)
+            jumpCooldownCounter -= Time.deltaTime;
     }
 
     private void UpdateWallSlideState()
     {
         bool pushingIntoWall =
-            (MoveInput > 0.01f && facing == 1) ||
-            (MoveInput < -0.01f && facing == -1);
+            (MoveInput > 0.01f && sensors.WallSide == 1) ||
+            (MoveInput < -0.01f && sensors.WallSide == -1);
 
         IsWallSliding =
             !sensors.IsGrounded &&
@@ -138,16 +147,22 @@ public class PlayerController2D : MonoBehaviour
 
     private void HandleJumpInput()
     {
+        if (jumpCooldownCounter > 0f)
+            return;
+
         if (JumpPressedThisFrame && IsWallSliding)
         {
             DoWallJump();
             return;
         }
 
-        if (jumpBufferCounter > 0f && coyoteCounter > 0f)
-        {
+        bool canGroundJump =
+            jumpBufferCounter > 0f &&
+            coyoteCounter > 0f &&
+            rb.linearVelocity.y <= 0.05f;
+
+        if (canGroundJump)
             DoGroundJump();
-        }
     }
 
     private void HandleJumpCut()
@@ -179,59 +194,29 @@ public class PlayerController2D : MonoBehaviour
 
     private void DoGroundJump()
     {
-        float bonusX = 0f;
-        float bonusY = 0f;
-
-        IsPerfectEdgeJump(out bonusX, out bonusY);
-
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x + bonusX, jumpForce + bonusY);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
 
         jumpBufferCounter = 0f;
         coyoteCounter = 0f;
+        jumpCooldownCounter = jumpCooldown;
         IsWallSliding = false;
+        JumpPressedThisFrame = false;
     }
 
     private void DoWallJump()
     {
-        int wallDir = facing;
+        int wallSide = sensors.WallSide == 0 ? facing : sensors.WallSide;
 
-        rb.linearVelocity = new Vector2(-wallDir * wallJumpX, wallJumpY);
+        rb.linearVelocity = new Vector2(-wallSide * wallJumpX, wallJumpY);
 
         wallJumpLockCounter = wallJumpLockTime;
         wallRegrabBlockCounter = wallRegrabBlockTime;
         jumpBufferCounter = 0f;
         coyoteCounter = 0f;
+        jumpCooldownCounter = jumpCooldown;
         IsWallSliding = false;
         JumpHeld = true;
-    }
-
-    private bool IsPerfectEdgeJump(out float horizontalBonus, out float verticalBonus)
-    {
-        horizontalBonus = 0f;
-        verticalBonus = 0f;
-
-        RaycastHit2D groundHit = Physics2D.Raycast(
-            transform.position,
-            Vector2.down,
-            perfectJumpGroundRayLength,
-            sensors.groundLayer
-        );
-
-        if (!groundHit.collider)
-            return false;
-
-        Bounds b = groundHit.collider.bounds;
-        float distLeft = Mathf.Abs(transform.position.x - b.min.x);
-        float distRight = Mathf.Abs(transform.position.x - b.max.x);
-        float nearest = Mathf.Min(distLeft, distRight);
-
-        if (nearest > perfectJumpDistance)
-            return false;
-
-        float dir = distRight < distLeft ? 1f : -1f;
-        horizontalBonus = dir * perfectJumpHorizontalBonus;
-        verticalBonus = perfectJumpVerticalBonus;
-        return true;
+        JumpPressedThisFrame = false;
     }
 
     private void ApplyBetterGravity()
@@ -251,7 +236,6 @@ public class PlayerController2D : MonoBehaviour
     {
         Vector2 input = value.Get<Vector2>();
         MoveInput = input.x;
-        Debug.Log("Move input = " + input);
     }
 
     public void OnJump(InputValue value)
@@ -267,19 +251,5 @@ public class PlayerController2D : MonoBehaviour
             JumpHeld = false;
             JumpReleasedThisFrame = true;
         }
-    }
-
-    public void OnJumpRelease(InputValue value)
-    {
-        JumpHeld = false;
-        JumpReleasedThisFrame = true;
-    }
-
-    public void OnParry(InputValue value)
-    {
-        if (!value.isPressed)
-            return;
-
-        ParryPressedThisFrame = true;
     }
 }

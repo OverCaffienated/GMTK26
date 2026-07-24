@@ -5,26 +5,31 @@ public class PlayerSensors2D : MonoBehaviour
     [Header("Checks")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private Transform wallCheck;
-    [SerializeField] private Transform ledgeCheck;
+
+    [Header("References")]
+    [SerializeField] private Rigidbody2D rb;
 
     [Header("Ground")]
-    [SerializeField] private float groundRadius = 0.12f;
-    public LayerMask groundLayer;
+    [SerializeField] private float groundRadius = 0.1f;
 
     [Header("Wall")]
-    [SerializeField] private float wallDistance = 0.25f;
-    public LayerMask wallLayer;
-
-    [Header("Ledge")]
-    [SerializeField] private Vector2 ledgeBoxSize = new Vector2(0.4f, 0.8f);
-    public LayerMask ledgeLayer;
+    [SerializeField] private float wallDistance = 0.2f;
 
     public bool IsGrounded { get; private set; }
     public bool IsTouchingWall { get; private set; }
     public RaycastHit2D WallHit { get; private set; }
-    public Collider2D LedgeCandidate { get; private set; }
+    public int WallSide { get; private set; }
 
     private int facing = 1;
+    private Collider2D[] selfColliders;
+
+    private void Awake()
+    {
+        if (rb == null)
+            rb = GetComponent<Rigidbody2D>();
+
+        selfColliders = GetComponentsInChildren<Collider2D>();
+    }
 
     public void SetFacing(int dir)
     {
@@ -33,45 +38,94 @@ public class PlayerSensors2D : MonoBehaviour
 
     public void Tick()
     {
-        if (groundCheck != null)
-            IsGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
-        else
-            IsGrounded = false;
+        IsGrounded = CheckGrounded();
+        CheckWall();
+    }
 
-        if (wallCheck != null)
-            WallHit = Physics2D.Raycast(wallCheck.position, Vector2.right * facing, wallDistance, wallLayer);
-        else
-            WallHit = default;
+    private bool CheckGrounded()
+    {
+        if (groundCheck == null)
+            return false;
 
-        IsTouchingWall = WallHit.collider != null;
+        if (rb.linearVelocity.y > 0.05f)
+            return false;
 
-        if (ledgeCheck != null)
-            LedgeCandidate = Physics2D.OverlapBox(ledgeCheck.position, ledgeBoxSize, 0f, ledgeLayer);
-        else
-            LedgeCandidate = null;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(groundCheck.position, groundRadius);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Collider2D hit = hits[i];
+
+            if (hit == null)
+                continue;
+
+            if (IsSelfCollider(hit))
+                continue;
+
+            if (hit.isTrigger)
+                continue;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void CheckWall()
+    {
+        IsTouchingWall = false;
+        WallHit = default;
+        WallSide = 0;
+
+        if (wallCheck == null)
+            return;
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(wallCheck.position, Vector2.right * facing, wallDistance);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider == null)
+                continue;
+
+            if (IsSelfCollider(hits[i].collider))
+                continue;
+
+            if (hits[i].collider.isTrigger)
+                continue;
+
+            WallHit = hits[i];
+            IsTouchingWall = true;
+            WallSide = facing;
+            return;
+        }
+    }
+
+    private bool IsSelfCollider(Collider2D col)
+    {
+        if (col == null || selfColliders == null)
+            return false;
+
+        for (int i = 0; i < selfColliders.Length; i++)
+        {
+            if (col == selfColliders[i])
+                return true;
+        }
+
+        return false;
     }
 
     private void OnDrawGizmosSelected()
     {
         if (groundCheck != null)
         {
-            Gizmos.color = Color.green;
+            Gizmos.color = IsGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
         }
 
         if (wallCheck != null)
         {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(
-                wallCheck.position,
-                wallCheck.position + Vector3.right * facing * wallDistance
-            );
-        }
-
-        if (ledgeCheck != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(ledgeCheck.position, ledgeBoxSize);
+            Gizmos.color = IsTouchingWall ? Color.green : Color.cyan;
+            Vector3 dir = Vector3.right * facing * wallDistance;
+            Gizmos.DrawLine(wallCheck.position, wallCheck.position + dir);
+            Gizmos.DrawWireSphere(wallCheck.position + dir, 0.03f);
         }
     }
 }
