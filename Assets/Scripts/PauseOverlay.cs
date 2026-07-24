@@ -2,12 +2,7 @@ using UnityEngine;
 
 public class PauseOverlay : MonoBehaviour
 {
-    [SerializeField] private GameObject pausePanel;
-
-    private void Start()
-    {
-        pausePanel.SetActive(false);
-    }
+    [SerializeField] private PauseMenuUI pauseMenuUI;
 
     private void Update()
     {
@@ -16,22 +11,10 @@ public class PauseOverlay : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameStateManager.Instance.CurrentState == GameStateManager.GameState.Playing)
-                Pause();
-            else if (GameStateManager.Instance.CurrentState == GameStateManager.GameState.Paused)
-                Resume();
+            if (pauseMenuUI != null)
+            {
+                pauseMenuUI.HandlePausePressed();
+            }
         }
-    }
-
-    public void Pause()
-    {
-        GameStateManager.Instance.SetState(GameStateManager.GameState.Paused);
-        pausePanel.SetActive(true);
-    }
-
-    public void Resume()
-    {
-        GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
-        pausePanel.SetActive(false);
     }
 }

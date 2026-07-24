@@ -10,7 +10,11 @@ public class PlayerCombatOrParry : MonoBehaviour
     [SerializeField] private GameObject swordHitboxObject;
     [SerializeField] private Animator swordHitboxAnimator;
     [SerializeField] private GameObject parryParticle;
-    [SerializeField] private GameObject deathScreenPanel;
+
+    [Header("Scene Transition Names")]
+    [SerializeField] private string guillotineSceneName = "GuillotineDeathScene";
+    [SerializeField] private string permanentDeathSceneName = "PermanentDeathScene";
+    [SerializeField] private string gameplaySceneName = "MainGame";
 
     [Header("Stats")]
     [SerializeField] private int maxLives = 3;
@@ -25,7 +29,6 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     [SerializeField] private float shadowRewindAmount = 2f;
     private bool isDead = false;
-    private bool awaitingReviveParry = false;
 
     [Header("Attack Settings")]
     [SerializeField] private float attackDuration = 0.35f;
@@ -39,7 +42,6 @@ public class PlayerCombatOrParry : MonoBehaviour
 
         if (swordHitboxObject != null) swordHitboxObject.SetActive(false);
         if (parryParticle != null) parryParticle.SetActive(false);
-        if (deathScreenPanel != null) deathScreenPanel.SetActive(false);
     }
 
     private void Update()
@@ -83,14 +85,7 @@ public class PlayerCombatOrParry : MonoBehaviour
     {
         if (value.isPressed && !isDead)
         {
-            if (CanParry)
-            {
-                ActivateParry();
-            }
-        }
-        else if (value.isPressed && awaitingReviveParry)
-        {
-            AttemptRevive();
+            if (CanParry) ActivateParry();
         }
     }
 
@@ -137,48 +132,21 @@ public class PlayerCombatOrParry : MonoBehaviour
 
         if (currentLives <= 0)
         {
-            TriggerInstantDeath();
+            TriggerCombatDeath();
         }
     }
 
-    public void TriggerInstantDeath()
+    public void TriggerCombatDeath()
     {
         if (isDead) return;
         isDead = true;
-
-        if (deathScreenPanel != null)
-            deathScreenPanel.SetActive(true);
-
-        if (anim != null)
-            anim.Play("Death");
-
-        StartCoroutine(ReviveWindowRoutine());
+        SceneManager.LoadScene(guillotineSceneName);
     }
-
-    private IEnumerator ReviveWindowRoutine()
+    public void TriggerPermanentDeath()
     {
-        awaitingReviveParry = true;
-        float reviveTimer = 2.0f;
-
-        yield return new WaitForSeconds(reviveTimer);
-
-        if (awaitingReviveParry)
-        {
-            awaitingReviveParry = false;
-        }
-    }
-
-    private void AttemptRevive()
-    {
-        awaitingReviveParry = false;
-        isDead = false;
-        currentLives = 1;
-
-        if (deathScreenPanel != null)
-            deathScreenPanel.SetActive(false);
-
-        if (anim != null)
-            anim.Play("Idle");
+        if (isDead) return;
+        isDead = true;
+        SceneManager.LoadScene(permanentDeathSceneName);
     }
 
     public void ParryShadow(ShadowPlayback shadow)
@@ -188,7 +156,7 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     public void RestartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene(gameplaySceneName);
     }
 
     public void ReturnToMenu()

@@ -1,17 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
 {
-    public enum SettingsReturnTarget
-    {
-        None,
-        MainMenu,
-        PauseMenu
-    }
-
     [Header("Panels")]
-    [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject settingsPanel;
 
@@ -20,16 +13,11 @@ public class PauseMenuUI : MonoBehaviour
     [SerializeField] private Button pauseSettingsButton;
     [SerializeField] private Button pauseMainMenuButton;
 
-    [Header("Main Menu Buttons")]
-    [SerializeField] private Button mainMenuSettingsButton;
-
     [Header("Settings Buttons")]
     [SerializeField] private Button settingsBackButton;
 
-    [Header("Refs")]
-    [SerializeField] private MainSceneMenu mainSceneMenu;
-
-    private SettingsReturnTarget settingsReturnTarget = SettingsReturnTarget.None;
+    [Header("Scene Config")]
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private void Awake()
     {
@@ -37,13 +25,10 @@ public class PauseMenuUI : MonoBehaviour
             resumeButton.onClick.AddListener(ResumeGame);
 
         if (pauseSettingsButton != null)
-            pauseSettingsButton.onClick.AddListener(OpenSettingsFromPause);
+            pauseSettingsButton.onClick.AddListener(OpenSettings);
 
         if (pauseMainMenuButton != null)
             pauseMainMenuButton.onClick.AddListener(ReturnToMainMenu);
-
-        if (mainMenuSettingsButton != null)
-            mainMenuSettingsButton.onClick.AddListener(OpenSettingsFromMainMenu);
 
         if (settingsBackButton != null)
             settingsBackButton.onClick.AddListener(CloseSettings);
@@ -55,13 +40,10 @@ public class PauseMenuUI : MonoBehaviour
             resumeButton.onClick.RemoveListener(ResumeGame);
 
         if (pauseSettingsButton != null)
-            pauseSettingsButton.onClick.RemoveListener(OpenSettingsFromPause);
+            pauseSettingsButton.onClick.RemoveListener(OpenSettings);
 
         if (pauseMainMenuButton != null)
             pauseMainMenuButton.onClick.RemoveListener(ReturnToMainMenu);
-
-        if (mainMenuSettingsButton != null)
-            mainMenuSettingsButton.onClick.RemoveListener(OpenSettingsFromMainMenu);
 
         if (settingsBackButton != null)
             settingsBackButton.onClick.RemoveListener(CloseSettings);
@@ -79,12 +61,6 @@ public class PauseMenuUI : MonoBehaviour
     public void HandlePausePressed()
     {
         if (GameStateManager.Instance == null)
-            return;
-
-        if (GameStateManager.Instance.CurrentState == GameStateManager.GameState.MainMenu)
-            return;
-
-        if (GameStateManager.Instance.CurrentState == GameStateManager.GameState.IntroPan)
             return;
 
         if (settingsPanel != null && settingsPanel.activeSelf)
@@ -113,6 +89,8 @@ public class PauseMenuUI : MonoBehaviour
 
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
+
+        Time.timeScale = 0f;
     }
 
     public void ResumeGame()
@@ -123,39 +101,19 @@ public class PauseMenuUI : MonoBehaviour
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
 
-        settingsReturnTarget = SettingsReturnTarget.None;
+        Time.timeScale = 1f;
 
         if (GameStateManager.Instance != null)
             GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
     }
 
-    public void OpenSettingsFromPause()
+    public void OpenSettings()
     {
-        settingsReturnTarget = SettingsReturnTarget.PauseMenu;
-
         if (pausePanel != null)
             pausePanel.SetActive(false);
 
         if (settingsPanel != null)
             settingsPanel.SetActive(true);
-
-        Debug.Log("Opened settings from pause");
-    }
-
-    public void OpenSettingsFromMainMenu()
-    {
-        settingsReturnTarget = SettingsReturnTarget.MainMenu;
-
-        if (mainMenuPanel != null)
-            mainMenuPanel.SetActive(false);
-
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-
-        if (settingsPanel != null)
-            settingsPanel.SetActive(true);
-
-        Debug.Log("Opened settings from main menu");
     }
 
     public void CloseSettings()
@@ -163,31 +121,13 @@ public class PauseMenuUI : MonoBehaviour
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
 
-        if (settingsReturnTarget == SettingsReturnTarget.PauseMenu)
-        {
-            if (pausePanel != null)
-                pausePanel.SetActive(true);
-        }
-        else if (settingsReturnTarget == SettingsReturnTarget.MainMenu)
-        {
-            if (mainMenuPanel != null)
-                mainMenuPanel.SetActive(true);
-        }
-
-        settingsReturnTarget = SettingsReturnTarget.None;
+        if (pausePanel != null)
+            pausePanel.SetActive(true);
     }
 
     public void ReturnToMainMenu()
     {
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
-
-        settingsReturnTarget = SettingsReturnTarget.None;
-
-        if (mainSceneMenu != null)
-            mainSceneMenu.ShowMainMenuAgain();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }

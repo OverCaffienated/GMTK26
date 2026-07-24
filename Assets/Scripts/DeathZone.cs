@@ -9,7 +9,7 @@ public class DeathZone : MonoBehaviour
             PlayerCombatOrParry combat = collision.GetComponent<PlayerCombatOrParry>();
             if (combat != null)
             {
-                combat.TriggerInstantDeath();
+                combat.TriggerPermanentDeath();
             }
         }
     }

@@ -4,20 +4,15 @@ public class GameStateManager : MonoBehaviour
 {
     public enum GameState
     {
-        MainMenu,
-        IntroPan,
         Playing,
         Paused
     }
 
     public static GameStateManager Instance { get; private set; }
 
-    public GameState CurrentState { get; private set; } = GameState.MainMenu;
+    public GameState CurrentState { get; private set; } = GameState.Playing;
 
-    public bool GameplayLocked =>
-        CurrentState == GameState.MainMenu ||
-        CurrentState == GameState.IntroPan ||
-        CurrentState == GameState.Paused;
+    public bool GameplayLocked => CurrentState == GameState.Paused;
 
     private void Awake()
     {
