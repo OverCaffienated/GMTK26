@@ -1,31 +1,19 @@
 fileFormatVersion: 2
-guid: 4a195ba7e731f504684a1f3e36860226
+guid: 1426aea0f885cf041bae1f923931502a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7156654543185612186
-    second: StillSpriteSheet_0
+      213: 3822349845581434254
+    second: EnemyRun_0
   - first:
-      213: 7776337787975159184
-    second: StillSpriteSheet_1
+      213: -7786183542486924054
+    second: EnemyRun_1
   - first:
-      213: 2476713163151446302
-    second: StillSpriteSheet_2
+      213: -8414793482567314535
+    second: EnemyRun_2
   - first:
-      213: -6010619867930496178
-    second: StillSpriteSheet_3
-  - first:
-      213: 1887747155877534268
-    second: StillSpriteSheet_4
-  - first:
-      213: 765499296573008145
-    second: StillSpriteSheet_5
-  - first:
-      213: -7708152915321925719
-    second: StillSpriteSheet_6
-  - first:
-      213: 3688655617800088574
-    second: StillSpriteSheet_7
+      213: 1712683479587804553
+    second: EnemyRun_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +60,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -134,73 +122,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: StillSpriteSheet_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a9d83c2b36b815360800000000000000
-      internalID: 7156654543185612186
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 09dc4b1740a1beb60800000000000000
-      internalID: 7776337787975159184
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_2
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e111d2cef7d0f5220800000000000000
-      internalID: 2476713163151446302
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_3
+      name: EnemyRun_0
       rect:
         serializedVersion: 2
         x: 0
@@ -215,14 +137,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e43f814631df59ca0800000000000000
-      internalID: -6010619867930496178
+      spriteID: e8d8621dee6bb0530800000000000000
+      internalID: 3822349845581434254
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: StillSpriteSheet_4
+      name: EnemyRun_1
       rect:
         serializedVersion: 2
         x: 64
@@ -237,36 +159,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c3a95db5900a23a10800000000000000
-      internalID: 1887747155877534268
+      spriteID: ae40312325be1f390800000000000000
+      internalID: -7786183542486924054
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: StillSpriteSheet_5
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 119ab00fd899f9a00800000000000000
-      internalID: 765499296573008145
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_6
+      name: EnemyRun_2
       rect:
         serializedVersion: 2
         x: 0
@@ -281,14 +181,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9af48d753c3270590800000000000000
-      internalID: -7708152915321925719
+      spriteID: 9939d4d39e5a83b80800000000000000
+      internalID: -8414793482567314535
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: StillSpriteSheet_7
+      name: EnemyRun_3
       rect:
         serializedVersion: 2
         x: 64
@@ -303,8 +203,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: efb29b5bdbcb03330800000000000000
-      internalID: 3688655617800088574
+      spriteID: 985d28dec8ca4c710800000000000000
+      internalID: 1712683479587804553
       vertices: []
       indices: 
       edges: []
@@ -313,7 +213,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 2308788f88b3e744582cf9aeb1a7f1b5
     internalID: 0
     vertices: []
     indices: 
@@ -325,14 +225,10 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      StillSpriteSheet_0: 7156654543185612186
-      StillSpriteSheet_1: 7776337787975159184
-      StillSpriteSheet_2: 2476713163151446302
-      StillSpriteSheet_3: -6010619867930496178
-      StillSpriteSheet_4: 1887747155877534268
-      StillSpriteSheet_5: 765499296573008145
-      StillSpriteSheet_6: -7708152915321925719
-      StillSpriteSheet_7: 3688655617800088574
+      EnemyRun_0: 3822349845581434254
+      EnemyRun_1: -7786183542486924054
+      EnemyRun_2: -8414793482567314535
+      EnemyRun_3: 1712683479587804553
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

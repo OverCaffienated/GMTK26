@@ -1,31 +1,22 @@
 fileFormatVersion: 2
-guid: 4a195ba7e731f504684a1f3e36860226
+guid: 47e2b138f4aeaad42a1622cd4bb4182c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7156654543185612186
-    second: StillSpriteSheet_0
+      213: -5634180532314106647
+    second: DeathPreppingAttack_0
   - first:
-      213: 7776337787975159184
-    second: StillSpriteSheet_1
+      213: -2139394961755489292
+    second: DeathPreppingAttack_1
   - first:
-      213: 2476713163151446302
-    second: StillSpriteSheet_2
+      213: 3102331346072123388
+    second: DeathPreppingAttack_2
   - first:
-      213: -6010619867930496178
-    second: StillSpriteSheet_3
+      213: -1275138946074160206
+    second: DeathPreppingAttack_3
   - first:
-      213: 1887747155877534268
-    second: StillSpriteSheet_4
-  - first:
-      213: 765499296573008145
-    second: StillSpriteSheet_5
-  - first:
-      213: -7708152915321925719
-    second: StillSpriteSheet_6
-  - first:
-      213: 3688655617800088574
-    second: StillSpriteSheet_7
+      213: -3741316568299951700
+    second: DeathPreppingAttack_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +63,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -134,73 +125,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: StillSpriteSheet_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a9d83c2b36b815360800000000000000
-      internalID: 7156654543185612186
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 09dc4b1740a1beb60800000000000000
-      internalID: 7776337787975159184
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_2
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e111d2cef7d0f5220800000000000000
-      internalID: 2476713163151446302
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_3
+      name: DeathPreppingAttack_0
       rect:
         serializedVersion: 2
         x: 0
@@ -215,14 +140,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e43f814631df59ca0800000000000000
-      internalID: -6010619867930496178
+      spriteID: 9e41ff238ae5fc1b0800000000000000
+      internalID: -5634180532314106647
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: StillSpriteSheet_4
+      name: DeathPreppingAttack_1
       rect:
         serializedVersion: 2
         x: 64
@@ -237,36 +162,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c3a95db5900a23a10800000000000000
-      internalID: 1887747155877534268
+      spriteID: 4fbbd460e975f42e0800000000000000
+      internalID: -2139394961755489292
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: StillSpriteSheet_5
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 119ab00fd899f9a00800000000000000
-      internalID: 765499296573008145
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: StillSpriteSheet_6
+      name: DeathPreppingAttack_2
       rect:
         serializedVersion: 2
         x: 0
@@ -281,14 +184,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9af48d753c3270590800000000000000
-      internalID: -7708152915321925719
+      spriteID: cf730322ce1bd0b20800000000000000
+      internalID: 3102331346072123388
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: StillSpriteSheet_7
+      name: DeathPreppingAttack_3
       rect:
         serializedVersion: 2
         x: 64
@@ -303,8 +206,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: efb29b5bdbcb03330800000000000000
-      internalID: 3688655617800088574
+      spriteID: 2b3dbff62ebcd4ee0800000000000000
+      internalID: -1275138946074160206
       vertices: []
       indices: 
       edges: []
@@ -313,7 +216,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 86d7a31fabc412541a91c271f2546926
     internalID: 0
     vertices: []
     indices: 
@@ -325,14 +228,10 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      StillSpriteSheet_0: 7156654543185612186
-      StillSpriteSheet_1: 7776337787975159184
-      StillSpriteSheet_2: 2476713163151446302
-      StillSpriteSheet_3: -6010619867930496178
-      StillSpriteSheet_4: 1887747155877534268
-      StillSpriteSheet_5: 765499296573008145
-      StillSpriteSheet_6: -7708152915321925719
-      StillSpriteSheet_7: 3688655617800088574
+      DeathPreppingAttack_0: -5634180532314106647
+      DeathPreppingAttack_1: -2139394961755489292
+      DeathPreppingAttack_2: 3102331346072123388
+      DeathPreppingAttack_3: -1275138946074160206
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

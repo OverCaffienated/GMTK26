@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerSensors2D))]
@@ -8,6 +9,13 @@ public class PlayerController2D : MonoBehaviour
     [Header("References")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private PlayerSensors2D sensors;
+
+    [Header("Animation & Visuals")]
+    [SerializeField] private Animator anim;
+    [SerializeField] private Transform visualRoot;
+    [SerializeField] private ParticleSystem runTrail;
+    [SerializeField] private float maxLeanAngle = 10f;
+    [SerializeField] private float leanSpeed = 8f;
 
     [Header("Move")]
     [SerializeField] private float moveSpeed = 8f;
@@ -19,42 +27,39 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float jumpBufferTime = 0.1f;
     [SerializeField] private float jumpCutMultiplier = 0.5f;
     [SerializeField] private float jumpCooldown = 0.05f;
+    [SerializeField] private float jumpWindupDelay = 0.08f;
 
-    [Header("Gravity")]
+    [Header("Gravity (Realistic Arc)")]
     [SerializeField] private float baseGravity = 4f;
     [SerializeField] private float fallGravityMultiplier = 1.8f;
     [SerializeField] private float lowJumpGravityMultiplier = 1.4f;
+    [SerializeField] private float apexBonusMultiplier = 0.5f;
     [SerializeField] private float maxFallSpeed = -20f;
 
     [Header("Wall")]
-    [SerializeField] private float wallSlideSpeed = -2f;
-    [SerializeField] private float wallJumpX = 10f;
-    [SerializeField] private float wallJumpY = 14f;
-    [SerializeField] private float wallJumpLockTime = 0.15f;
-    [SerializeField] private float wallRegrabBlockTime = 0.12f;
+    [SerializeField] private float wallJumpX = 14f;
+    [SerializeField] private float wallJumpY = 12f;
+    [SerializeField] private float wallJumpLockTime = 0.35f;
 
     public float MoveInput { get; private set; }
     public bool JumpHeld { get; private set; }
     public bool JumpPressedThisFrame { get; private set; }
     public bool JumpReleasedThisFrame { get; private set; }
-    public bool IsWallSliding { get; private set; }
     public int Facing => facing;
 
     private float coyoteCounter;
     private float jumpBufferCounter;
     private float wallJumpLockCounter;
-    private float wallRegrabBlockCounter;
     private float jumpCooldownCounter;
+    private float jumpWindupCounter;
+    private bool isWaitingToJump = false;
     private int facing = 1;
 
     private void Awake()
     {
-        if (rb == null)
-            rb = GetComponent<Rigidbody2D>();
-
-        if (sensors == null)
-            sensors = GetComponent<PlayerSensors2D>();
-
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (sensors == null) sensors = GetComponent<PlayerSensors2D>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
         rb.freezeRotation = true;
     }
 
@@ -66,6 +71,7 @@ public class PlayerController2D : MonoBehaviour
             JumpHeld = false;
             JumpPressedThisFrame = false;
             JumpReleasedThisFrame = false;
+            if (runTrail != null) runTrail.Stop();
             return;
         }
 
@@ -74,14 +80,12 @@ public class PlayerController2D : MonoBehaviour
         sensors.Tick();
 
         UpdateTimers();
-        UpdateWallSlideState();
         HandleJumpInput();
         HandleJumpCut();
+        UpdateAnimations();
 
         JumpPressedThisFrame = false;
         JumpReleasedThisFrame = false;
-
-        //Debug.Log($"Grounded={sensors.IsGrounded}, VelY={rb.linearVelocity.y}, Coyote={coyoteCounter}, Buffer={jumpBufferCounter}");
     }
 
     private void FixedUpdate()
@@ -93,76 +97,68 @@ public class PlayerController2D : MonoBehaviour
         }
 
         ApplyHorizontalMovement();
-        ApplyWallSlide();
         ApplyBetterGravity();
+        ApplyLeaning();
     }
 
-   
     private void UpdateFacing()
     {
-        if (MoveInput > 0.01f)
-            facing = 1;
-        else if (MoveInput < -0.01f)
-            facing = -1;
+        if (MoveInput > 0.01f) facing = 1;
+        else if (MoveInput < -0.01f) facing = -1;
 
-        Vector3 scale = transform.localScale;
-        scale.x = Mathf.Abs(scale.x) * facing;
-        transform.localScale = scale;
+        if (visualRoot != null)
+        {
+            Vector3 scale = visualRoot.localScale;
+            scale.x = Mathf.Abs(scale.x) * facing;
+            visualRoot.localScale = scale;
+        }
+
+        if (runTrail != null)
+        {
+            var shape = runTrail.shape;
+        }
     }
-   
 
     private void UpdateTimers()
     {
-        if (sensors.IsGrounded && rb.linearVelocity.y <= 0.05f)
+        if (sensors.IsGrounded)
             coyoteCounter = coyoteTime;
         else
             coyoteCounter -= Time.deltaTime;
 
-        if (jumpBufferCounter > 0f)
-            jumpBufferCounter -= Time.deltaTime;
-
-        if (wallJumpLockCounter > 0f)
-            wallJumpLockCounter -= Time.deltaTime;
-
-        if (wallRegrabBlockCounter > 0f)
-            wallRegrabBlockCounter -= Time.deltaTime;
-
-        if (jumpCooldownCounter > 0f)
-            jumpCooldownCounter -= Time.deltaTime;
-    }
-
-    private void UpdateWallSlideState()
-    {
-        bool pushingIntoWall =
-            (MoveInput > 0.01f && sensors.WallSide == 1) ||
-            (MoveInput < -0.01f && sensors.WallSide == -1);
-
-        IsWallSliding =
-            !sensors.IsGrounded &&
-            sensors.IsTouchingWall &&
-            rb.linearVelocity.y < 0f &&
-            pushingIntoWall &&
-            wallRegrabBlockCounter <= 0f;
+        if (jumpBufferCounter > 0f) jumpBufferCounter -= Time.deltaTime;
+        if (wallJumpLockCounter > 0f) wallJumpLockCounter -= Time.deltaTime;
+        if (jumpCooldownCounter > 0f) jumpCooldownCounter -= Time.deltaTime;
+        if (jumpWindupCounter > 0f) jumpWindupCounter -= Time.deltaTime;
     }
 
     private void HandleJumpInput()
     {
-        if (jumpCooldownCounter > 0f)
-            return;
+        if (jumpCooldownCounter > 0f || isWaitingToJump) return;
 
-        if (JumpPressedThisFrame && IsWallSliding)
+        if (JumpPressedThisFrame && !sensors.IsGrounded && sensors.IsTouchingWall)
         {
             DoWallJump();
             return;
         }
 
-        bool canGroundJump =
-            jumpBufferCounter > 0f &&
-            coyoteCounter > 0f &&
-            rb.linearVelocity.y <= 0.05f;
+        bool canGroundJump = jumpBufferCounter > 0f && coyoteCounter > 0f;
 
-        if (canGroundJump)
-            DoGroundJump();
+        if (canGroundJump && !isWaitingToJump)
+        {
+            StartCoroutine(DelayedJumpRoutine());
+        }
+    }
+
+    private IEnumerator DelayedJumpRoutine()
+    {
+        isWaitingToJump = true;
+        jumpWindupCounter = jumpWindupDelay;
+
+        yield return new WaitForSeconds(jumpWindupDelay);
+
+        isWaitingToJump = false;
+        DoGroundJump();
     }
 
     private void HandleJumpCut()
@@ -176,60 +172,80 @@ public class PlayerController2D : MonoBehaviour
 
     private void ApplyHorizontalMovement()
     {
-        if (wallJumpLockCounter > 0f)
-            return;
+        if (wallJumpLockCounter > 0f) return;
 
         float control = sensors.IsGrounded ? 1f : airControl;
         rb.linearVelocity = new Vector2(MoveInput * moveSpeed * control, rb.linearVelocity.y);
     }
 
-    private void ApplyWallSlide()
+    private void ApplyBetterGravity()
     {
-        if (!IsWallSliding)
-            return;
+        bool isAtApex = Mathf.Abs(rb.linearVelocity.y) < 2f && !sensors.IsGrounded && JumpHeld;
 
-        float clampedY = Mathf.Max(rb.linearVelocity.y, wallSlideSpeed);
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, clampedY);
+        if (rb.linearVelocity.y < 0f)
+            rb.gravityScale = baseGravity * fallGravityMultiplier;
+        else if (rb.linearVelocity.y > 0f && !JumpHeld)
+            rb.gravityScale = baseGravity * lowJumpGravityMultiplier;
+        else if (isAtApex)
+            rb.gravityScale = baseGravity * apexBonusMultiplier;
+        else
+            rb.gravityScale = baseGravity;
+
+        if (rb.linearVelocity.y < maxFallSpeed)
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
+    }
+
+    private void ApplyLeaning()
+    {
+        if (visualRoot == null) return;
+
+        float speedRatio = rb.linearVelocity.x / moveSpeed;
+        float targetZRotation = speedRatio * -maxLeanAngle;
+
+        Quaternion targetRotation = Quaternion.Euler(0, 0, targetZRotation);
+        visualRoot.localRotation = Quaternion.Lerp(visualRoot.localRotation, targetRotation, Time.deltaTime * leanSpeed);
+    }
+
+    private void UpdateAnimations()
+    {
+        if (anim == null) return;
+
+        if (!sensors.IsGrounded)
+        {
+            anim.Play("Jump");
+            if (runTrail != null) runTrail.Stop();
+        }
+        else if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
+        {
+            anim.Play("Run");
+            if (runTrail != null && !runTrail.isPlaying) runTrail.Play();
+        }
+        else
+        {
+            anim.Play("Idle");
+            if (runTrail != null) runTrail.Stop();
+        }
     }
 
     private void DoGroundJump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-
         jumpBufferCounter = 0f;
         coyoteCounter = 0f;
         jumpCooldownCounter = jumpCooldown;
-        IsWallSliding = false;
         JumpPressedThisFrame = false;
     }
 
     private void DoWallJump()
     {
         int wallSide = sensors.WallSide == 0 ? facing : sensors.WallSide;
-
         rb.linearVelocity = new Vector2(-wallSide * wallJumpX, wallJumpY);
-
         wallJumpLockCounter = wallJumpLockTime;
-        wallRegrabBlockCounter = wallRegrabBlockTime;
         jumpBufferCounter = 0f;
         coyoteCounter = 0f;
         jumpCooldownCounter = jumpCooldown;
-        IsWallSliding = false;
         JumpHeld = true;
         JumpPressedThisFrame = false;
-    }
-
-    private void ApplyBetterGravity()
-    {
-        rb.gravityScale = baseGravity;
-
-        if (rb.linearVelocity.y < 0f)
-            rb.gravityScale = baseGravity * fallGravityMultiplier;
-        else if (rb.linearVelocity.y > 0f && !JumpHeld)
-            rb.gravityScale = baseGravity * lowJumpGravityMultiplier;
-
-        if (rb.linearVelocity.y < maxFallSpeed)
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
     }
 
     public void OnMove(InputValue value)

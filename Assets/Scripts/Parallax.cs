@@ -16,13 +16,10 @@ public class Parallax : MonoBehaviour
 
     void LateUpdate()
     {
-        // Calculate how much the camera moved since the last frame
         Vector3 deltaMovement = mainCamera.transform.position - previousCameraPosition;
 
-        // Move this object based on that camera movement and the multiplier
         transform.position += new Vector3(deltaMovement.x * parallaxMultiplier, deltaMovement.y * parallaxMultiplier, 0);
 
-        // Save the new camera position for the next frame
         previousCameraPosition = mainCamera.transform.position;
     }
 }

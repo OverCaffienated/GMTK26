@@ -8,14 +8,20 @@ public class ShadowDifficultyDirector : MonoBehaviour
     public int threshold = 3;
     public float delayReduction = 0.4f;
     public float minDelay = 2.5f;
+    public float farDistance = 5f;
 
     private Queue<float> catchupEvents = new Queue<float>();
     private bool wasCatchingUp;
 
     void Update()
     {
-        bool catchingUp = shadow != null && shadow.enabled &&
-                          Vector2.Distance(shadow.transform.position, shadow.recorder.target.position) > shadow.farDistance;
+        if (shadow == null) return;
+
+        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
+        if (player == null) return;
+
+        bool catchingUp = shadow.enabled &&
+                          Vector2.Distance(shadow.transform.position, player.transform.position) > farDistance;
 
         if (catchingUp && !wasCatchingUp)
             catchupEvents.Enqueue(Time.time);

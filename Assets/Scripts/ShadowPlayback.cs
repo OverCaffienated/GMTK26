@@ -1,52 +1,95 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class ShadowPlayback : MonoBehaviour
 {
-    public ShadowRecorder recorder;
-    public float delaySeconds = 4f;
-    public float catchupSpeedMultiplier = 1.5f;
-    public float normalPlaybackMultiplier = 1f;
-    public float farDistance = 7f;
-    public float nearDistance = 4f;
+    [Header("References")]
+    [SerializeField] private PlayerController2D player;
+    [SerializeField] private Animator shadowAnim;
+    [SerializeField] private GameObject glintParticle;
 
-    private float playbackMultiplier = 1f;
-    private float localTime;
+    [Header("Shadow Settings")]
+    public float delaySeconds = 2f;
+    [SerializeField] private float attackTriggerDistance = 2.5f;
+    [SerializeField] private float attackCooldown = 4f;
 
-    void Update()
+    private struct PlayerState
     {
-        if (recorder.frames.Count < 2) return;
-
-        float targetTime = recorder.frames[recorder.frames.Count - 1].time - delaySeconds;
-
-        float gap = Vector2.Distance(transform.position, recorder.target.position);
-        playbackMultiplier = gap > farDistance ? catchupSpeedMultiplier :
-                             gap < nearDistance ? normalPlaybackMultiplier :
-                             playbackMultiplier;
-
-        localTime = Mathf.MoveTowards(localTime, targetTime, Time.deltaTime * playbackMultiplier);
-
-        ApplyFrameAtTime(localTime);
+        public Vector3 position;
+        public int facing;
+        public float time;
     }
 
-    void ApplyFrameAtTime(float t)
-    {
-        List<ShadowFrame> frames = recorder.frames;
-        for (int i = 0; i < frames.Count - 1; i++)
-        {
-            if (frames[i].time <= t && frames[i + 1].time >= t)
-            {
-                ShadowFrame a = frames[i];
-                ShadowFrame b = frames[i + 1];
-                float lerp = Mathf.InverseLerp(a.time, b.time, t);
+    private Queue<PlayerState> history = new Queue<PlayerState>();
+    private bool isAttacking = false;
+    private float attackTimer = 0f;
 
-                transform.position = Vector2.Lerp(a.position, b.position, lerp);
+    private void Start()
+    {
+        if (player == null) player = FindFirstObjectByType<PlayerController2D>();
+        if (glintParticle != null) glintParticle.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (player == null) return;
+
+        attackTimer += Time.deltaTime;
+
+        history.Enqueue(new PlayerState
+        {
+            position = player.transform.position,
+            facing = player.Facing,
+            time = Time.time
+        });
+
+        while (history.Count > 0 && Time.time - history.Peek().time > delaySeconds)
+        {
+            PlayerState state = history.Dequeue();
+            if (!isAttacking)
+            {
+                transform.position = state.position;
 
                 Vector3 scale = transform.localScale;
-                scale.x = Mathf.Abs(scale.x) * (a.facingRight ? 1 : -1);
+                scale.x = Mathf.Abs(scale.x) * state.facing;
                 transform.localScale = scale;
-                return;
             }
         }
+
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+        if (distanceToPlayer <= attackTriggerDistance && attackTimer >= attackCooldown && !isAttacking)
+        {
+            StartCoroutine(ShadowAttackRoutine());
+        }
+    }
+
+    private IEnumerator ShadowAttackRoutine()
+    {
+        isAttacking = true;
+        attackTimer = 0f;
+
+        if (shadowAnim != null)
+        {
+            shadowAnim.Play("ReaperAttack", -1, 0f);
+        }
+
+        yield return new WaitForSeconds(0.4f);
+
+        if (glintParticle != null)
+        {
+            glintParticle.SetActive(true);
+        }
+
+        yield return new WaitForSeconds(0.25f);
+
+        if (glintParticle != null)
+        {
+            glintParticle.SetActive(false);
+        }
+
+        yield return new WaitForSeconds(0.3f);
+
+        isAttacking = false;
     }
 }
