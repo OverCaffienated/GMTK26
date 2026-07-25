@@ -5,11 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class GuillotineManager : MonoBehaviour
 {
+    public static GuillotineManager Instance { get; private set; }
+
     [Header("References")]
+    [SerializeField] private GameObject guillotineVisualRoot;
     [SerializeField] private GameObject glintObject;
     [SerializeField] private Animator guillotineAnimator;
     [SerializeField] private AudioSource guillotineAudioSource;
-    [SerializeField] private string gameplaySceneName = "MainGame";
     [SerializeField] private string permanentDeathSceneName = "PermanentDeathScene";
 
     [Header("Timing Config")]
@@ -18,38 +20,57 @@ public class GuillotineManager : MonoBehaviour
 
     private bool canParryNow = false;
     private bool sequenceEnded = false;
+    private PlayerCombatOrParry deadPlayer;
 
-    private void Start()
+    private void Awake()
     {
-        if (glintObject != null) glintObject.SetActive(false);
-
-        if (guillotineAnimator != null)
+        if (Instance != null && Instance != this)
         {
-            guillotineAnimator.SetTrigger("Fall");
+            Destroy(gameObject);
+            return;
         }
+        Instance = this;
 
-        if (guillotineAudioSource != null)
-        {
-            guillotineAudioSource.Play();
-        }
-
-        StartCoroutine(GuillotineSequence());
+        if (guillotineVisualRoot != null) guillotineVisualRoot.SetActive(false);
     }
 
     private void Update()
     {
-        bool parryPressed = (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame) ||
-                            (Keyboard.current != null && (Keyboard.current.kKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame));
-
-        if (canParryNow && !sequenceEnded && parryPressed)
+        if (!sequenceEnded && canParryNow)
         {
-            SuccessParry();
+            bool parryPressed = (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame) ||
+                                (Keyboard.current != null && (Keyboard.current.kKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame));
+
+            if (parryPressed)
+            {
+                SuccessParry();
+            }
         }
+    }
+
+    public void StartGuillotineEvent(PlayerCombatOrParry player)
+    {
+        deadPlayer = player;
+        sequenceEnded = false;
+        canParryNow = false;
+
+        Time.timeScale = 0f;
+
+        if (guillotineVisualRoot != null) guillotineVisualRoot.SetActive(true);
+        if (glintObject != null) glintObject.SetActive(false);
+
+        if (guillotineAudioSource != null) guillotineAudioSource.Play();
+
+        StartCoroutine(GuillotineSequence());
     }
 
     private IEnumerator GuillotineSequence()
     {
+        yield return null;
+        if (guillotineAnimator != null) guillotineAnimator.SetTrigger("Fall");
+
         float randomDelay = Random.Range(totalDuration - 1.8f, totalDuration - 0.8f);
+
         yield return new WaitForSecondsRealtime(Mathf.Max(0.5f, randomDelay));
 
         canParryNow = true;
@@ -75,13 +96,13 @@ public class GuillotineManager : MonoBehaviour
     {
         sequenceEnded = true;
         if (glintObject != null) glintObject.SetActive(false);
+        if (guillotineVisualRoot != null) guillotineVisualRoot.SetActive(false);
 
         Time.timeScale = 1f;
 
-        PlayerCombatOrParry playerCombat = FindAnyObjectByType<PlayerCombatOrParry>();
-        if (playerCombat != null)
+        if (deadPlayer != null)
         {
-
+            deadPlayer.ReviveWithLowHP();
         }
 
         ShadowPlayback shadow = FindAnyObjectByType<ShadowPlayback>();
@@ -89,7 +110,5 @@ public class GuillotineManager : MonoBehaviour
         {
             shadow.ApplyGuillotineRespawn();
         }
-
-        SceneManager.UnloadSceneAsync("GuillotineDeathScene");
     }
 }

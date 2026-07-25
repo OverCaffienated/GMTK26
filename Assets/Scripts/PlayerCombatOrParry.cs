@@ -244,7 +244,22 @@ public class PlayerCombatOrParry : MonoBehaviour
         ShadowPlayback shadow = FindAnyObjectByType<ShadowPlayback>();
         if (shadow != null) shadow.BoostSpeedTemporarily();
 
-        if (currentLives <= 0) SceneManager.LoadScene(guillotineSceneName);
+        if (currentLives <= 0)
+        {
+            if (GuillotineManager.Instance != null)
+            {
+                GuillotineManager.Instance.StartGuillotineEvent(this);
+            }
+            else
+            {
+                Debug.LogError("GuillotineManager is missing from the scene!");
+            }
+        }
+    }
+
+    public void ReviveWithLowHP()
+    {
+        currentLives = 1;
     }
 
     public void TriggerPermanentDeath()

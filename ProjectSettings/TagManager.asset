@@ -60,6 +60,15 @@ TagManager:
   - name: Foreground
     uniqueID: 2863732819
     locked: 0
+  - name: PlayerUI
+    uniqueID: 1240822635
+    locked: 0
+  - name: GuillotineUI
+    uniqueID: 1144132837
+    locked: 0
+  - name: Fade
+    uniqueID: 968482847
+    locked: 0
   m_RenderingLayers:
   - Default
   m_MigratedRenderPipelines: []
