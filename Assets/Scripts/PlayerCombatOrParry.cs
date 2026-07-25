@@ -16,6 +16,8 @@ public class PlayerCombatOrParry : MonoBehaviour
     [SerializeField] private float parryCooldown = 5.0f;
     [SerializeField] private float parryPushbackDistance = 0.3f;
     [SerializeField] private GameObject parryEffectPrefab;
+    [SerializeField] private float parryShakeDuration = 0.2f;
+    [SerializeField] private float parryShakeIntensity = 0.3f;
     private bool isParryActive = false;
     private float parryTimer = 0f;
     private float nextParryTime = 0f;
@@ -35,9 +37,18 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     [Header("Player Audio")]
     [SerializeField] private AudioSource playerAudioSource;
+
     [SerializeField] private AudioClip parryReadySound;
+    [Range(0f, 1f)][SerializeField] private float parryReadyVolume = 1f;
+
     [SerializeField] private AudioClip parryUsedSound;
+    [Range(0f, 1f)][SerializeField] private float parryUsedVolume = 1f;
+
+    [SerializeField] private AudioClip parrySuccessSound;
+    [Range(0f, 1f)][SerializeField] private float parrySuccessVolume = 1f;
+
     [SerializeField] private AudioClip swordSwingSound;
+    [Range(0f, 1f)][SerializeField] private float swordSwingVolume = 1f;
 
     [Header("Player Animations")]
     [SerializeField] private Animator anim;
@@ -72,9 +83,10 @@ public class PlayerCombatOrParry : MonoBehaviour
         {
             if (parryAvailableUI != null) parryAvailableUI.SetActive(true);
             if (parryUnavailableUI != null) parryUnavailableUI.SetActive(false);
+
             if (!wasParryReady && playerAudioSource != null && parryReadySound != null)
             {
-                playerAudioSource.PlayOneShot(parryReadySound);
+                playerAudioSource.PlayOneShot(parryReadySound, parryReadyVolume);
             }
         }
         else
@@ -100,9 +112,10 @@ public class PlayerCombatOrParry : MonoBehaviour
         {
             StartCoroutine(ActivateParryWindow());
             nextParryTime = Time.time + parryCooldown;
+
             if (playerAudioSource != null && parryUsedSound != null)
             {
-                playerAudioSource.PlayOneShot(parryUsedSound);
+                playerAudioSource.PlayOneShot(parryUsedSound, parryUsedVolume);
             }
         }
     }
@@ -123,9 +136,10 @@ public class PlayerCombatOrParry : MonoBehaviour
             {
                 StartCoroutine(AttackRoutine());
                 nextAttackTime = Time.time + attackCooldown;
+
                 if (playerAudioSource != null && swordSwingSound != null)
                 {
-                    playerAudioSource.PlayOneShot(swordSwingSound);
+                    playerAudioSource.PlayOneShot(swordSwingSound, swordSwingVolume);
                 }
             }
         }
@@ -193,6 +207,16 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     public void TriggerParryEffect()
     {
+        if (playerAudioSource != null && parrySuccessSound != null)
+        {
+            playerAudioSource.PlayOneShot(parrySuccessSound, parrySuccessVolume);
+        }
+
+        if (CameraShake.Instance != null)
+        {
+            CameraShake.Instance.Shake(parryShakeDuration, parryShakeIntensity);
+        }
+
         if (parryEffectPrefab != null)
         {
             float randomXOffset = Random.Range(0.8f, 1.5f);

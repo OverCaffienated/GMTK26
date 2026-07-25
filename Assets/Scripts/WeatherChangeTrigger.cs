@@ -16,6 +16,11 @@ public class WeatherChangeTrigger : MonoBehaviour
     [Header("Audio Fade References")]
     [SerializeField] private AudioSource rainAudioSource;
     [SerializeField] private GameObject thunderManagerObject;
+    [SerializeField] private AudioSource happyMusicAudioSource;
+    [SerializeField] private AudioSource windAudioSource;
+    [SerializeField] private GameObject randomAmbientSFXObject;
+    [SerializeField] private float targetHappyMusicVolume = 0.5f;
+    [SerializeField] private float targetWindVolume = 0.3f;
 
     [Header("Weather Transition Settings")]
     [SerializeField] private float transitionDuration = 4.0f;
@@ -55,6 +60,11 @@ public class WeatherChangeTrigger : MonoBehaviour
                 thunderManagerObject.SetActive(false);
             }
 
+            if (randomAmbientSFXObject != null)
+            {
+                randomAmbientSFXObject.SetActive(true);
+            }
+
             StartCoroutine(WeatherTransitionRoutine());
         }
     }
@@ -68,6 +78,18 @@ public class WeatherChangeTrigger : MonoBehaviour
         Color startCamColor = mainCamera != null ? mainCamera.backgroundColor : Color.black;
 
         float startRainVolume = rainAudioSource != null ? rainAudioSource.volume : 1f;
+
+        if (happyMusicAudioSource != null)
+        {
+            happyMusicAudioSource.volume = 0f;
+            happyMusicAudioSource.Play();
+        }
+
+        if (windAudioSource != null)
+        {
+            windAudioSource.volume = 0f;
+            windAudioSource.Play();
+        }
 
         Color cloudColor = Color.white;
         float startCloudAlpha = 0f;
@@ -131,6 +153,16 @@ public class WeatherChangeTrigger : MonoBehaviour
                 rainAudioSource.volume = Mathf.Lerp(startRainVolume, 0f, percent);
             }
 
+            if (happyMusicAudioSource != null)
+            {
+                happyMusicAudioSource.volume = Mathf.Lerp(0f, targetHappyMusicVolume, percent);
+            }
+
+            if (windAudioSource != null)
+            {
+                windAudioSource.volume = Mathf.Lerp(0f, targetWindVolume, percent);
+            }
+
             if (cloudsBackground != null)
             {
                 cloudColor.a = Mathf.Lerp(startCloudAlpha, targetCloudAlpha, percent);
@@ -163,6 +195,9 @@ public class WeatherChangeTrigger : MonoBehaviour
             rainAudioSource.volume = 0f;
             rainAudioSource.Stop();
         }
+
+        if (happyMusicAudioSource != null) happyMusicAudioSource.volume = targetHappyMusicVolume;
+        if (windAudioSource != null) windAudioSource.volume = targetWindVolume;
 
         if (cloudsBackground != null)
         {

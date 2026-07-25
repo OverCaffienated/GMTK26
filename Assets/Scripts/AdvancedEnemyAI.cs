@@ -10,6 +10,12 @@ public class AdvancedEnemyAI : MonoBehaviour
     [SerializeField] private GameObject attackHitboxObject;
     [SerializeField] private Transform visualRoot;
 
+    [Header("Enemy Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip attackSound;
+    [SerializeField] private AudioClip aggroGruntSound;
+    [Range(0f, 1f)][SerializeField] private float gruntVolume = 1f;
+
     [Header("Enemy Animations (Exact Names)")]
     [SerializeField] private string runAnimName = "EnemyRun";
     [SerializeField] private string idleAnimName = "EnemyIdle";
@@ -52,6 +58,7 @@ public class AdvancedEnemyAI : MonoBehaviour
     private bool isPaused = false;
     private bool canBeParriedNow = false;
     private float moveTimer = 0f;
+    private bool wasAggroLastFrame = false;
 
     private int currentMoveDirection = 1;
 
@@ -87,8 +94,18 @@ public class AdvancedEnemyAI : MonoBehaviour
         }
 
         float distance = Vector2.Distance(transform.position, player.transform.position);
+        bool isAggro = distance <= aggroRadius;
 
-        if (distance > aggroRadius)
+        if (!wasAggroLastFrame && isAggro)
+        {
+            if (audioSource != null && aggroGruntSound != null)
+            {
+                audioSource.PlayOneShot(aggroGruntSound, gruntVolume);
+            }
+        }
+        wasAggroLastFrame = isAggro;
+
+        if (!isAggro)
         {
             HandlePatrolMovement();
         }
@@ -230,6 +247,11 @@ public class AdvancedEnemyAI : MonoBehaviour
     private IEnumerator AttackRoutine()
     {
         isAttacking = true;
+
+        if (audioSource != null && attackSound != null)
+        {
+            audioSource.PlayOneShot(attackSound);
+        }
 
         if (anim != null && !string.IsNullOrEmpty(attackAnimName))
             anim.Play(attackAnimName, -1, 0f);

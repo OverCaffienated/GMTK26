@@ -24,6 +24,10 @@ public class CutsceneManager : MonoBehaviour
     [SerializeField] private float fadeSpeed = 1.5f;
     [SerializeField] private string nextSceneName;
 
+    [Header("End Cutscene Music Controls")]
+    [SerializeField] private bool isEndCutscene = false;
+    [SerializeField] private float musicFadeOutDuration = 2.0f;
+
     private int currentSlideIndex = 0;
     private bool isWaitingForClick = false;
 
@@ -56,7 +60,6 @@ public class CutsceneManager : MonoBehaviour
     {
         while (currentSlideIndex < slides.Length)
         {
-
             slideText.text = slides[currentSlideIndex].text;
 
             if (slides[currentSlideIndex].image != null)
@@ -76,6 +79,13 @@ public class CutsceneManager : MonoBehaviour
             }
             contentCanvasGroup.alpha = 1f;
 
+            if (isEndCutscene && PersistentMusicPlayer.Instance != null && slides.Length > 1)
+            {
+                float volumePercent = 1f - ((float)currentSlideIndex / (slides.Length - 1));
+                volumePercent = Mathf.Clamp(volumePercent, 0.1f, 1f);
+                PersistentMusicPlayer.Instance.ReduceVolumeForNextSlide(volumePercent, 1.5f);
+            }
+
             isWaitingForClick = true;
             while (isWaitingForClick)
             {
@@ -92,6 +102,13 @@ public class CutsceneManager : MonoBehaviour
             currentSlideIndex++;
             yield return new WaitForSeconds(0.5f);
         }
-        SceneManager.LoadScene(nextSceneName);
+        if (isEndCutscene && PersistentMusicPlayer.Instance != null)
+        {
+            PersistentMusicPlayer.Instance.FadeOutAndLoadScene(nextSceneName, musicFadeOutDuration);
+        }
+        else
+        {
+            SceneManager.LoadScene(nextSceneName);
+        }
     }
 }

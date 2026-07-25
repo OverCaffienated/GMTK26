@@ -14,6 +14,7 @@ public class PlayerSensors2D : MonoBehaviour
 
     [Header("Wall")]
     [SerializeField] private float wallDistance = 0.2f;
+    [SerializeField] private Vector2 wallBoxSize = new Vector2(0.1f, 0.5f);
 
     public bool IsGrounded { get; private set; }
     public bool IsTouchingWall { get; private set; }
@@ -23,11 +24,12 @@ public class PlayerSensors2D : MonoBehaviour
     private int facing = 1;
     private Collider2D[] selfColliders;
 
+    private readonly Collider2D[] groundHitsBuffer = new Collider2D[8];
+    private readonly RaycastHit2D[] wallHitsBuffer = new RaycastHit2D[8];
+
     private void Awake()
     {
-        if (rb == null)
-            rb = GetComponent<Rigidbody2D>();
-
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
         selfColliders = GetComponentsInChildren<Collider2D>();
     }
 
@@ -44,29 +46,18 @@ public class PlayerSensors2D : MonoBehaviour
 
     private bool CheckGrounded()
     {
-        if (groundCheck == null)
-            return false;
+        if (groundCheck == null) return false;
+        if (rb.linearVelocity.y > 0.05f) return false;
 
-        if (rb.linearVelocity.y > 0.05f)
-            return false;
-
-        Collider2D[] hits = Physics2D.OverlapCircleAll(groundCheck.position, groundRadius);
-        for (int i = 0; i < hits.Length; i++)
+        int count = Physics2D.OverlapCircleNonAlloc(groundCheck.position, groundRadius, groundHitsBuffer);
+        for (int i = 0; i < count; i++)
         {
-            Collider2D hit = hits[i];
-
-            if (hit == null)
-                continue;
-
-            if (IsSelfCollider(hit))
-                continue;
-
-            if (hit.isTrigger)
-                continue;
-
+            Collider2D hit = groundHitsBuffer[i];
+            if (hit == null) continue;
+            if (IsSelfCollider(hit)) continue;
+            if (hit.isTrigger) continue;
             return true;
         }
-
         return false;
     }
 
@@ -76,39 +67,37 @@ public class PlayerSensors2D : MonoBehaviour
         WallHit = default;
         WallSide = 0;
 
-        if (wallCheck == null)
-            return;
+        if (wallCheck == null) return;
 
-        RaycastHit2D[] hits = Physics2D.RaycastAll(wallCheck.position, Vector2.right * facing, wallDistance);
-        for (int i = 0; i < hits.Length; i++)
+        if (TryFindWall(1)) return;
+        if (TryFindWall(-1)) return;
+    }
+
+    private bool TryFindWall(int side)
+    {
+        int count = Physics2D.BoxCastNonAlloc(wallCheck.position, wallBoxSize, 0f, Vector2.right * side, wallHitsBuffer, wallDistance);
+        for (int i = 0; i < count; i++)
         {
-            if (hits[i].collider == null)
-                continue;
+            Collider2D col = wallHitsBuffer[i].collider;
+            if (col == null) continue;
+            if (IsSelfCollider(col)) continue;
+            if (col.isTrigger) continue;
 
-            if (IsSelfCollider(hits[i].collider))
-                continue;
-
-            if (hits[i].collider.isTrigger)
-                continue;
-
-            WallHit = hits[i];
+            WallHit = wallHitsBuffer[i];
             IsTouchingWall = true;
-            WallSide = facing;
-            return;
+            WallSide = side;
+            return true;
         }
+        return false;
     }
 
     private bool IsSelfCollider(Collider2D col)
     {
-        if (col == null || selfColliders == null)
-            return false;
-
+        if (col == null || selfColliders == null) return false;
         for (int i = 0; i < selfColliders.Length; i++)
         {
-            if (col == selfColliders[i])
-                return true;
+            if (col == selfColliders[i]) return true;
         }
-
         return false;
     }
 
@@ -123,9 +112,14 @@ public class PlayerSensors2D : MonoBehaviour
         if (wallCheck != null)
         {
             Gizmos.color = IsTouchingWall ? Color.green : Color.cyan;
-            Vector3 dir = Vector3.right * facing * wallDistance;
-            Gizmos.DrawLine(wallCheck.position, wallCheck.position + dir);
-            Gizmos.DrawWireSphere(wallCheck.position + dir, 0.03f);
+            Vector3 rightDir = Vector3.right * wallDistance;
+            Gizmos.DrawLine(wallCheck.position, wallCheck.position + rightDir);
+            Gizmos.DrawLine(wallCheck.position, wallCheck.position - rightDir);
+
+            if (IsTouchingWall)
+            {
+                Gizmos.DrawWireCube(wallCheck.position + Vector3.right * WallSide * wallDistance, wallBoxSize);
+            }
         }
     }
 }

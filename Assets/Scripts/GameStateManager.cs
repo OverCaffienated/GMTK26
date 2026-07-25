@@ -12,7 +12,13 @@ public class GameStateManager : MonoBehaviour
 
     public GameState CurrentState { get; private set; } = GameState.Playing;
 
-    public bool GameplayLocked => CurrentState == GameState.Paused;
+    private bool cutsceneLock = false;
+
+    public bool GameplayLocked
+    {
+        get { return CurrentState == GameState.Paused || cutsceneLock; }
+        set { cutsceneLock = value; }
+    }
 
     private void Awake()
     {

@@ -10,6 +10,18 @@ public class ShadowPlayback : MonoBehaviour
     [SerializeField] private GameObject attackHitboxObject;
     [SerializeField] private string permanentDeathSceneName = "GuillotineDeathScene";
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource tickingAudioSource;
+    [SerializeField] private float maxHearingDistance = 20f;
+    [SerializeField] private float maxTickingVolume = 1f;
+
+    [Header("Shadow Attack Audio")]
+    [SerializeField] private AudioSource shadowAudioSource;
+    [SerializeField] private AudioClip bodyAttackSound;
+    [Range(0f, 1f)][SerializeField] private float bodyAttackVolume = 1f;
+    [SerializeField] private AudioClip clockSummonSound;
+    [Range(0f, 1f)][SerializeField] private float clockSummonVolume = 1f;
+
     [Header("Shadow Animations (Exact Names)")]
     [SerializeField] private string idleAnimName = "DeathPreppingAttack_0";
     [SerializeField] private string bodyAttackAnimName = "ReaperAttack";
@@ -58,11 +70,25 @@ public class ShadowPlayback : MonoBehaviour
         {
             Physics2D.IgnoreCollision(shadowCol, playerCol, true);
         }
+
+        if (tickingAudioSource != null)
+        {
+            tickingAudioSource.loop = true;
+            tickingAudioSource.volume = 0f;
+            tickingAudioSource.Play();
+        }
     }
 
     private void Update()
     {
         if (player == null) return;
+
+        if (tickingAudioSource != null)
+        {
+            float dist = Vector2.Distance(transform.position, player.transform.position);
+            float vol = Mathf.Clamp01(1f - (dist / maxHearingDistance)) * maxTickingVolume;
+            tickingAudioSource.volume = vol;
+        }
 
         if (Time.timeSinceLevelLoad < delaySeconds) return;
 
@@ -142,9 +168,15 @@ public class ShadowPlayback : MonoBehaviour
         isAttacking = true;
         attackTimer = 0f;
 
+        // 1. Play Body Attack Animation & Sound
         if (shadowAnim != null && !string.IsNullOrEmpty(bodyAttackAnimName))
         {
             shadowAnim.Play(bodyAttackAnimName, -1, 0f);
+        }
+
+        if (shadowAudioSource != null && bodyAttackSound != null)
+        {
+            shadowAudioSource.PlayOneShot(bodyAttackSound, bodyAttackVolume);
         }
 
         float bodyAnimLeadIn = 0.8f;
@@ -161,9 +193,16 @@ public class ShadowPlayback : MonoBehaviour
             yield return null;
         }
 
+        // 2. Summon the Clock Hitbox & Play Clock Sound
         if (attackHitboxObject != null)
         {
             attackHitboxObject.SetActive(true);
+
+            if (shadowAudioSource != null && clockSummonSound != null)
+            {
+                shadowAudioSource.PlayOneShot(clockSummonSound, clockSummonVolume);
+            }
+
             Animator clockAnim = attackHitboxObject.GetComponent<Animator>();
             if (clockAnim != null && !string.IsNullOrEmpty(clockAttackAnimName))
             {
@@ -189,7 +228,7 @@ public class ShadowPlayback : MonoBehaviour
 
             if (attackHitboxObject != null)
             {
-                attackHitboxObject.transform.position = player.transform.position;
+                attackHitboxObject.transform.position = player.transform.position + new Vector3(0, 0.5f, 0);
             }
             yield return null;
         }
@@ -203,7 +242,7 @@ public class ShadowPlayback : MonoBehaviour
             elapsed += Time.deltaTime;
             if (attackHitboxObject != null)
             {
-                attackHitboxObject.transform.position = player.transform.position;
+                attackHitboxObject.transform.position = player.transform.position + new Vector3(0, 0.5f, 0);
             }
             yield return null;
         }
