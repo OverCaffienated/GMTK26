@@ -48,8 +48,17 @@ TagManager:
   - name: Background
     uniqueID: 723721383
     locked: 0
+  - name: BackTrees
+    uniqueID: 4215713799
+    locked: 0
   - name: RainBG
     uniqueID: 265442665
+    locked: 0
+  - name: FrontTrees
+    uniqueID: 1612131187
+    locked: 0
+  - name: Objects
+    uniqueID: 2649298853
     locked: 0
   - name: Default
     uniqueID: 0
