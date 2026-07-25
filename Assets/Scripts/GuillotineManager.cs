@@ -8,6 +8,7 @@ public class GuillotineManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameObject glintObject;
     [SerializeField] private Animator guillotineAnimator;
+    [SerializeField] private AudioSource guillotineAudioSource;
     [SerializeField] private string gameplaySceneName = "MainGame";
     [SerializeField] private string permanentDeathSceneName = "PermanentDeathScene";
 
@@ -27,6 +28,11 @@ public class GuillotineManager : MonoBehaviour
             guillotineAnimator.SetTrigger("Fall");
         }
 
+        if (guillotineAudioSource != null)
+        {
+            guillotineAudioSource.Play();
+        }
+
         StartCoroutine(GuillotineSequence());
     }
 
@@ -43,7 +49,6 @@ public class GuillotineManager : MonoBehaviour
 
     private IEnumerator GuillotineSequence()
     {
-
         float randomDelay = Random.Range(totalDuration - 1.8f, totalDuration - 0.8f);
         yield return new WaitForSecondsRealtime(Mathf.Max(0.5f, randomDelay));
 
