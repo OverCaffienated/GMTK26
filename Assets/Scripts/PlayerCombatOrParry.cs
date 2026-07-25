@@ -19,6 +19,11 @@ public class PlayerCombatOrParry : MonoBehaviour
     private bool isParryActive = false;
     private float parryTimer = 0f;
     private float nextParryTime = 0f;
+    private bool wasParryReady = false;
+
+    [Header("Parry UI Display")]
+    [SerializeField] private GameObject parryAvailableUI;
+    [SerializeField] private GameObject parryUnavailableUI;
 
     [Header("Attack Settings")]
     [SerializeField] private Transform attackPoint;
@@ -28,11 +33,17 @@ public class PlayerCombatOrParry : MonoBehaviour
     [SerializeField] private float attackCooldown = 0.4f;
     [SerializeField] private LayerMask enemyLayer;
 
+    [Header("Player Audio")]
+    [SerializeField] private AudioSource playerAudioSource;
+    [SerializeField] private AudioClip parryReadySound;
+    [SerializeField] private AudioClip parryUsedSound;
+    [SerializeField] private AudioClip swordSwingSound;
+
     [Header("Player Animations")]
     [SerializeField] private Animator anim;
-    [SerializeField] private string attackAnimationName = "SwordSlashAnim"; // Type your exact state name in the Inspector
-    [SerializeField] private string parryAnimationName = "ParryClip";       // Type your exact state name in the Inspector
-    [SerializeField] private string idleAnimationName = "Idle";             // So we can return to idle via code
+    [SerializeField] private string attackAnimationName = "SwordSlashAnim";
+    [SerializeField] private string parryAnimationName = "ParryClip";
+    [SerializeField] private string idleAnimationName = "Idle";
 
     private float nextAttackTime = 0f;
 
@@ -50,6 +61,29 @@ public class PlayerCombatOrParry : MonoBehaviour
     {
         HandleParryInput();
         HandleAttackInput();
+        UpdateParryUI();
+    }
+
+    private void UpdateParryUI()
+    {
+        bool currentParryReady = CanParry;
+
+        if (currentParryReady)
+        {
+            if (parryAvailableUI != null) parryAvailableUI.SetActive(true);
+            if (parryUnavailableUI != null) parryUnavailableUI.SetActive(false);
+            if (!wasParryReady && playerAudioSource != null && parryReadySound != null)
+            {
+                playerAudioSource.PlayOneShot(parryReadySound);
+            }
+        }
+        else
+        {
+            if (parryAvailableUI != null) parryAvailableUI.SetActive(false);
+            if (parryUnavailableUI != null) parryUnavailableUI.SetActive(true);
+        }
+
+        wasParryReady = currentParryReady;
     }
 
     private void HandleParryInput()
@@ -59,13 +93,17 @@ public class PlayerCombatOrParry : MonoBehaviour
         if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
             parryInput = true;
 
-        if (Keyboard.current != null && (Keyboard.current.kKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame))
+        if (Keyboard.current != null && Keyboard.current.kKey.wasPressedThisFrame)
             parryInput = true;
 
         if (parryInput && CanParry)
         {
             StartCoroutine(ActivateParryWindow());
             nextParryTime = Time.time + parryCooldown;
+            if (playerAudioSource != null && parryUsedSound != null)
+            {
+                playerAudioSource.PlayOneShot(parryUsedSound);
+            }
         }
     }
 
@@ -85,13 +123,16 @@ public class PlayerCombatOrParry : MonoBehaviour
             {
                 StartCoroutine(AttackRoutine());
                 nextAttackTime = Time.time + attackCooldown;
+                if (playerAudioSource != null && swordSwingSound != null)
+                {
+                    playerAudioSource.PlayOneShot(swordSwingSound);
+                }
             }
         }
     }
 
     private IEnumerator AttackRoutine()
     {
-        // 1. Force the attack animation to play via string name
         if (anim != null && !string.IsNullOrEmpty(attackAnimationName))
         {
             anim.Play(attackAnimationName, -1, 0f);
@@ -115,7 +156,6 @@ public class PlayerCombatOrParry : MonoBehaviour
         yield return new WaitForSeconds(attackCooldown);
         if (attackVisualObject != null) attackVisualObject.SetActive(false);
 
-        // Return to Idle when done
         if (anim != null && !string.IsNullOrEmpty(idleAnimationName))
         {
             anim.Play(idleAnimationName);
@@ -124,7 +164,6 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     private IEnumerator ActivateParryWindow()
     {
-        // 1. Force the parry animation to play via string name
         if (anim != null && !string.IsNullOrEmpty(parryAnimationName))
         {
             anim.Play(parryAnimationName, -1, 0f);
@@ -141,7 +180,6 @@ public class PlayerCombatOrParry : MonoBehaviour
 
         isParryActive = false;
 
-        // Return to Idle when done
         if (anim != null && !string.IsNullOrEmpty(idleAnimationName))
         {
             anim.Play(idleAnimationName);
@@ -171,19 +209,14 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     public void ApplyParryPushback(Vector3 attackerPosition)
     {
-        Vector3 pushDir = (transform.position - attackerPosition).normalized;
-        pushDir.y = 0;
-
-        if (pushDir == Vector3.zero)
-            pushDir = transform.localScale.x > 0 ? Vector3.left : Vector3.right;
-
-        transform.position += pushDir.normalized * parryPushbackDistance;
+        StringPushbackCheck();
     }
+
+    private void StringPushbackCheck() { }
 
     public void TakeDamage(int damage)
     {
         currentLives -= damage;
-
         ShadowPlayback shadow = FindAnyObjectByType<ShadowPlayback>();
         if (shadow != null) shadow.BoostSpeedTemporarily();
 

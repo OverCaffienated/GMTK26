@@ -280,7 +280,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 2
   m_Colors:
     m_NormalColor: {r: 0.27661088, g: 0.5283019, b: 0.3156604, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -290,10 +290,10 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
+    m_HighlightedSprite: {fileID: 21300000, guid: 7a62f0fd50298ac4eb0c590bfacfd423, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: 2bca3cb1835297542b74f0fd36f1bad9, type: 3}
+    m_SelectedSprite: {fileID: 21300000, guid: 2bca3cb1835297542b74f0fd36f1bad9, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: ead51b7585f7cbd4a8590823a1e8e86f, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -1032,6 +1032,10 @@ PrefabInstance:
     - target: {fileID: 2154002978137954086, guid: 29221aa3311a8f44ca7a4108da6605f5, type: 3}
       propertyPath: m_Name
       value: FaderCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154002978137954086, guid: 29221aa3311a8f44ca7a4108da6605f5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5996021838067166382, guid: 29221aa3311a8f44ca7a4108da6605f5, type: 3}
       propertyPath: m_Pivot.x

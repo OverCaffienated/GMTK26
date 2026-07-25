@@ -64,24 +64,28 @@ MonoBehaviour:
     the 2D Renderer in Universal RP.
   preview: {fileID: -3604256930052969394}
   dependencies:
-  - dependency: {fileID: 7400000, guid: 7dc738e3170a12c429aaaa0cc7c4f4b8, type: 2}
+  - dependency: {fileID: 5669138554282477529, guid: 803b09cd6e2ab9748b9207e3184cbe80, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 9100000, guid: 5879f57acb56d1341b92a65c733ccf33, type: 2}
     instantiationMode: 0
+  - dependency: {fileID: 8300000, guid: 2530cdf5e413b02468ff809ac045dc55, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 2800000, guid: 47e2b138f4aeaad42a1622cd4bb4182c, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: 57d3948ce2a803d4496b84d94986d05f, type: 3}
-    instantiationMode: 0
-  - dependency: {fileID: 2800000, guid: 2bca3cb1835297542b74f0fd36f1bad9, type: 3}
     instantiationMode: 0
   - dependency: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
     instantiationMode: 1
   - dependency: {fileID: 2800000, guid: 10ceab3a0f147fc40afd01d5c9b4f485, type: 3}
     instantiationMode: 0
+  - dependency: {fileID: 2800000, guid: 2bca3cb1835297542b74f0fd36f1bad9, type: 3}
+    instantiationMode: 0
   - dependency: {fileID: 11400000, guid: e734406d32e07484db079e4c3ef306a6, type: 2}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: f4ba41da882a2cd46ad7b3989b54501c, type: 3}
     instantiationMode: 0
+  - dependency: {fileID: 8300000, guid: 06df60910ebee7943849c01a73480f80, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 2800000, guid: 7a62f0fd50298ac4eb0c590bfacfd423, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: fc99ace3bc171c142b8dde83c43f2722, type: 3}
@@ -96,6 +100,8 @@ MonoBehaviour:
     instantiationMode: 0
   - dependency: {fileID: 9100000, guid: d18ed4ae9f443aa40bc734b798ed5168, type: 2}
     instantiationMode: 0
+  - dependency: {fileID: 8300000, guid: 60abcaaed2958384c9d0d3b14144471c, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 7400000, guid: dcb5e411ff0df2a47abd0de9b0b04c41, type: 2}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: 21fbea0f78bf833438ffcf2e553a4d84, type: 3}
@@ -126,6 +132,8 @@ MonoBehaviour:
     instantiationMode: 1
   - dependency: {fileID: 2800000, guid: d3e191102ec0d9a4b9cb004d13824f30, type: 3}
     instantiationMode: 0
+  - dependency: {fileID: 2800000, guid: 4647259348c7eb642a27e861f4f6ed0d, type: 3}
+    instantiationMode: 0
   - dependency: {fileID: 7400000, guid: 01b9804b9a27706439949bbbd357c988, type: 2}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: 04e45c2bbe1ba854d972777fb5d146f4, type: 3}
@@ -150,16 +158,24 @@ MonoBehaviour:
     instantiationMode: 0
   - dependency: {fileID: 2980304117941864695, guid: 8e86ef390afb8aa4185d0d5612c299ad, type: 3}
     instantiationMode: 0
+  - dependency: {fileID: 8300000, guid: d21e2ce7d62d6dd40aaf20de5ae1c68b, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 2800000, guid: 119f93d0bcbf1e743bf5fcf237507d39, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: bdffcf5327ab52b4e8fe6e60d0f748d6, type: 3}
+    instantiationMode: 0
+  - dependency: {fileID: 2800000, guid: 21677d95f0194b140b591e9efe989a45, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: 435fb2eb7a58c3f4d965f0c527c89639, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 2800000, guid: e74a5daeaf8058f4b866c4ea671decf4, type: 3}
     instantiationMode: 0
+  - dependency: {fileID: 8300000, guid: 592949db297f7eb43b6dc310f0d399a0, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 2800000, guid: c284228e9e90f524daff44380a6425e4, type: 3}
     instantiationMode: 0
+  - dependency: {fileID: 8300000, guid: ff2e3bb52b4726644a191a5191ed79d5, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 2800000, guid: 40265a896a0f341bb956e90c59025a29, type: 3}
     instantiationMode: 1
   - dependency: {fileID: 9100000, guid: ff4f245212b69764591e2c3a83818608, type: 2}
@@ -198,11 +214,13 @@ MonoBehaviour:
     instantiationMode: 1
   - dependency: {fileID: 11400000, guid: 6557b84602885c847be4600edb30da8d, type: 2}
     instantiationMode: 1
+  - dependency: {fileID: 8300000, guid: 9b8981163dac4334697032bb4da6837b, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 2154002978137954086, guid: 29221aa3311a8f44ca7a4108da6605f5, type: 3}
     instantiationMode: 0
-  - dependency: {fileID: 5669138554282477529, guid: 803b09cd6e2ab9748b9207e3184cbe80, type: 3}
-    instantiationMode: 0
   - dependency: {fileID: 7400000, guid: 62311c63fda86714dbf1036e3c4451dc, type: 2}
+    instantiationMode: 0
+  - dependency: {fileID: 7400000, guid: 7dc738e3170a12c429aaaa0cc7c4f4b8, type: 2}
     instantiationMode: 0
   - dependency: {fileID: 9100000, guid: 87e79df9f710b5c4898b8318e2376300, type: 2}
     instantiationMode: 0

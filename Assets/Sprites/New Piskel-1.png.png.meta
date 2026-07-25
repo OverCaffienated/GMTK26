@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: a076884a95b59e14d9a9a09c2beefff8
+guid: 4647259348c7eb642a27e861f4f6ed0d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1209471343733093561
-    second: hand design_0
+      213: 5931842347579807508
+    second: New Piskel-1.png_0
+  - first:
+      213: 6837126915485482293
+    second: New Piskel-1.png_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +49,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hand design_0
+      name: New Piskel-1.png_0
       rect:
         serializedVersion: 2
-        x: 83
-        y: 135
-        width: 74
-        height: 118
+        x: 47
+        y: 363
+        width: 962
+        height: 654
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +131,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9b4b93177c7e8c010800000000000000
-      internalID: 1209471343733093561
+      spriteID: 4171d17df23225250800000000000000
+      internalID: 5931842347579807508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: New Piskel-1.png_1
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 355
+        width: 54
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53d36c974ba52ee50800000000000000
+      internalID: 6837126915485482293
       vertices: []
       indices: 
       edges: []
@@ -138,7 +163,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hand design_0: 1209471343733093561
+      New Piskel-1.png_0: 5931842347579807508
+      New Piskel-1.png_1: 6837126915485482293
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
