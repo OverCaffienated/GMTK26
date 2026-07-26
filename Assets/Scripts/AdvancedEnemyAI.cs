@@ -16,6 +16,10 @@ public class AdvancedEnemyAI : MonoBehaviour
     [SerializeField] private AudioClip aggroGruntSound;
     [Range(0f, 1f)][SerializeField] private float gruntVolume = 1f;
 
+    [Header("Damage Audio")]
+    [SerializeField] private AudioClip damageTakenSound;
+    [Range(0f, 1f)][SerializeField] private float damageTakenVolume = 1f;
+
     [Header("Enemy Animations (Exact Names)")]
     [SerializeField] private string runAnimName = "EnemyRun";
     [SerializeField] private string idleAnimName = "EnemyIdle";
@@ -203,13 +207,20 @@ public class AdvancedEnemyAI : MonoBehaviour
 
         if (currentMoveDirection == 1)
         {
-            transform.position = Vector2.MoveTowards(transform.position, new Vector2(player.transform.position.x, player.transform.position.y), actualSpeedToMove * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(
+                transform.position,
+                new Vector2(player.transform.position.x, player.transform.position.y),
+                actualSpeedToMove * Time.deltaTime
+            );
             if (anim != null && !string.IsNullOrEmpty(runAnimName)) anim.Play(runAnimName, -1, 0f);
             ApplyLeaning(actualSpeedToMove);
         }
         else if (currentMoveDirection == -1)
         {
-            Vector2 awayTarget = new Vector2(transform.position.x + (transform.position.x > player.transform.position.x ? 1 : -1), transform.position.y);
+            Vector2 awayTarget = new Vector2(
+                transform.position.x + (transform.position.x > player.transform.position.x ? 1 : -1),
+                transform.position.y
+            );
             transform.position = Vector2.MoveTowards(transform.position, awayTarget, actualSpeedToMove * Time.deltaTime);
             if (anim != null && !string.IsNullOrEmpty(runAnimName)) anim.Play(runAnimName, -1, 0f);
             ApplyLeaning(-actualSpeedToMove);
@@ -321,7 +332,13 @@ public class AdvancedEnemyAI : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
+        if (audioSource != null && damageTakenSound != null)
+        {
+            audioSource.PlayOneShot(damageTakenSound, damageTakenVolume);
+        }
+
         currentHealth -= damageAmount;
+
         if (currentHealth <= 0)
         {
             StopAllCoroutines();
