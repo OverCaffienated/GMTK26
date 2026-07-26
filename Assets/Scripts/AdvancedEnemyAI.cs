@@ -3,6 +3,11 @@ using System.Collections;
 
 public class AdvancedEnemyAI : MonoBehaviour
 {
+    public enum EnemyType { Standard, Tank, Expert }
+
+    [Header("Enemy Archetype")]
+    [SerializeField] private EnemyType archetype = EnemyType.Standard;
+
     [Header("References")]
     [SerializeField] private PlayerController2D player;
     [SerializeField] private Animator anim;
@@ -19,6 +24,10 @@ public class AdvancedEnemyAI : MonoBehaviour
     [Header("Damage Audio")]
     [SerializeField] private AudioClip damageTakenSound;
     [Range(0f, 1f)][SerializeField] private float damageTakenVolume = 1f;
+
+    [Header("Block/Parry Audio")]
+    [SerializeField] private AudioClip blockSound;
+    [Range(0f, 1f)][SerializeField] private float blockVolume = 1f;
 
     [Header("Enemy Animations (Exact Names)")]
     [SerializeField] private string runAnimName = "EnemyRun";
@@ -52,11 +61,21 @@ public class AdvancedEnemyAI : MonoBehaviour
     [SerializeField] private float ledgeCheckDistance = 1.0f;
     [SerializeField] private LayerMask groundLayer;
 
-    [Header("Attack Timings")]
+    [Header("Attack Timings & Variance")]
     [SerializeField] private float totalAttackDuration = 1.0f;
     [SerializeField] private float parryWindowDuration = 0.25f;
     [SerializeField] private float minPauseBetweenAttacks = 0.5f;
     [SerializeField] private float maxPauseBetweenAttacks = 1.5f;
+    [SerializeField] private float minAttackSpeedBoost = 0.0f; // 0% faster
+    [SerializeField] private float maxAttackSpeedBoost = 0.15f; // 15% faster
+
+    [Header("Tank / Expert Settings")]
+    [SerializeField] private string stunAnimName = "EnemyStun";
+    [SerializeField] private float stunDuration = 2.0f;
+    [SerializeField] private int requiredParriesToStun = 2;
+    [SerializeField] private float expertParryCooldown = 2.5f;
+    [SerializeField] private string expertParryAnimName = "EnemyParry";
+    [SerializeField] private GameObject expertGlintParticle;
 
     private bool isAttacking = false;
     private bool isPaused = false;
@@ -65,6 +84,10 @@ public class AdvancedEnemyAI : MonoBehaviour
     private bool wasAggroLastFrame = false;
     private int currentMoveDirection = 1;
     private Rigidbody2D rb;
+
+    private bool isStunned = false;
+    private int currentParriesReceived = 0;
+    private float expertParryTimer = 0f;
 
     private void Awake()
     {
@@ -78,6 +101,7 @@ public class AdvancedEnemyAI : MonoBehaviour
         if (player == null) player = FindAnyObjectByType<PlayerController2D>();
         if (glintParticle != null) glintParticle.SetActive(false);
         if (attackHitboxObject != null) attackHitboxObject.SetActive(false);
+        if (expertGlintParticle != null) expertGlintParticle.SetActive(false);
 
         PickNewMovementState();
     }
@@ -85,6 +109,22 @@ public class AdvancedEnemyAI : MonoBehaviour
     private void Update()
     {
         if (player == null) return;
+
+        if (expertParryTimer > 0f) expertParryTimer -= Time.deltaTime;
+
+        if (archetype == EnemyType.Expert && !isStunned && !isAttacking && !isPaused)
+        {
+            PlayerCombatOrParry pc = player.GetComponent<PlayerCombatOrParry>();
+            if (pc != null && pc.IsAttacking && expertParryTimer <= 0f)
+            {
+                float dist = Vector2.Distance(transform.position, player.transform.position);
+                if (dist <= attackTriggerDistance + 1f)
+                {
+                    StartCoroutine(ExpertParryPlayerRoutine(pc));
+                    return;
+                }
+            }
+        }
 
         if (canBeParriedNow)
         {
@@ -96,7 +136,7 @@ public class AdvancedEnemyAI : MonoBehaviour
             }
         }
 
-        if (isAttacking || isPaused)
+        if (isAttacking || isPaused || isStunned)
         {
             if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             ApplyLeaning(0f);
@@ -279,20 +319,41 @@ public class AdvancedEnemyAI : MonoBehaviour
             audioSource.PlayOneShot(attackSound);
         }
 
+        // Calculate Random Speed Boost
+        float speedMod = 1f + Random.Range(minAttackSpeedBoost, maxAttackSpeedBoost);
+        if (anim != null) anim.speed = speedMod;
+
         PlayAnim(attackAnimName, true);
 
-        float windup = totalAttackDuration - parryWindowDuration;
+        // Adjust timings to match the new animation speed perfectly
+        float currentTotal = totalAttackDuration / speedMod;
+        float currentParry = parryWindowDuration / speedMod;
+        float windup = currentTotal - currentParry;
+
         yield return new WaitForSeconds(windup);
 
         canBeParriedNow = true;
         if (glintParticle != null) glintParticle.SetActive(true);
-        if (attackHitboxObject != null) attackHitboxObject.SetActive(true);
+        if (attackHitboxObject != null)
+        {
+            attackHitboxObject.SetActive(true);
+            // Ensure the weapon animation speeds up to match the body!
+            Animator weaponAnim = attackHitboxObject.GetComponent<Animator>();
+            if (weaponAnim != null) weaponAnim.speed = speedMod;
+        }
 
-        yield return new WaitForSeconds(parryWindowDuration);
+        yield return new WaitForSeconds(currentParry);
 
         canBeParriedNow = false;
         if (glintParticle != null) glintParticle.SetActive(false);
-        if (attackHitboxObject != null) attackHitboxObject.SetActive(false);
+        if (attackHitboxObject != null)
+        {
+            attackHitboxObject.SetActive(false);
+            Animator weaponAnim = attackHitboxObject.GetComponent<Animator>();
+            if (weaponAnim != null) weaponAnim.speed = 1f; // Reset weapon speed
+        }
+
+        if (anim != null) anim.speed = 1f; // Reset body speed
 
         if (isAttacking)
         {
@@ -315,32 +376,118 @@ public class AdvancedEnemyAI : MonoBehaviour
         isPaused = false;
     }
 
+    private IEnumerator ExpertParryPlayerRoutine(PlayerCombatOrParry pc)
+    {
+        isPaused = true;
+        expertParryTimer = expertParryCooldown;
+
+        if (audioSource != null && blockSound != null)
+        {
+            audioSource.PlayOneShot(blockSound, blockVolume);
+        }
+
+        PlayAnim(expertParryAnimName, true);
+        if (expertGlintParticle != null) expertGlintParticle.SetActive(true);
+
+        yield return new WaitForSeconds(0.15f);
+
+        if (pc != null)
+        {
+            pc.ApplyParryPushback(transform.position);
+        }
+
+        if (expertGlintParticle != null) expertGlintParticle.SetActive(false);
+
+        yield return new WaitForSeconds(0.4f);
+
+        isPaused = false;
+    }
+
     private void SuccessfulParry(PlayerCombatOrParry pc)
     {
         canBeParriedNow = false;
         if (glintParticle != null) glintParticle.SetActive(false);
-        if (attackHitboxObject != null) attackHitboxObject.SetActive(false);
+        if (attackHitboxObject != null)
+        {
+            attackHitboxObject.SetActive(false);
+            Animator weaponAnim = attackHitboxObject.GetComponent<Animator>();
+            if (weaponAnim != null) weaponAnim.speed = 1f; // Reset weapon speed on parry
+        }
+
+        if (anim != null) anim.speed = 1f; // Reset body speed on parry
 
         pc.TriggerParryEffect();
         pc.ApplyParryPushback(transform.position);
         pc.ResetParryCooldown();
 
         StopAllCoroutines();
-        StartCoroutine(StunRoutine());
+
+        if (archetype == EnemyType.Tank || archetype == EnemyType.Expert)
+        {
+            currentParriesReceived++;
+            if (currentParriesReceived >= requiredParriesToStun)
+            {
+                currentParriesReceived = 0;
+                StartCoroutine(StunRoutine(stunDuration));
+            }
+            else
+            {
+                StartCoroutine(ParryRecoveryRoutine());
+            }
+        }
+        else
+        {
+            StartCoroutine(StunRoutine(2.0f));
+        }
     }
 
-    private IEnumerator StunRoutine()
+    private IEnumerator ParryRecoveryRoutine()
     {
         isAttacking = false;
         isPaused = true;
 
-        yield return new WaitForSeconds(2.0f);
+        if (rb != null)
+        {
+            float pushDir = transform.position.x > player.transform.position.x ? 1f : -1f;
+            float force = archetype == EnemyType.Tank ? 2f : 5f;
+            rb.linearVelocity = new Vector2(pushDir * force, rb.linearVelocity.y);
+        }
 
+        PlayAnim(idleAnimName, true);
+
+        yield return new WaitForSeconds(0.6f);
+
+        isPaused = false;
+    }
+
+    private IEnumerator StunRoutine(float duration)
+    {
+        isAttacking = false;
+        isPaused = true;
+        isStunned = true;
+
+        PlayAnim(stunAnimName, true);
+
+        yield return new WaitForSeconds(duration);
+
+        isStunned = false;
         isPaused = false;
     }
 
     public void TakeDamage(int damageAmount)
     {
+        if (archetype == EnemyType.Tank || archetype == EnemyType.Expert)
+        {
+            if (!isStunned)
+            {
+                if (audioSource != null && blockSound != null)
+                {
+                    audioSource.PlayOneShot(blockSound, blockVolume);
+                }
+                return;
+            }
+        }
+
         if (audioSource != null && damageTakenSound != null)
         {
             audioSource.PlayOneShot(damageTakenSound, damageTakenVolume);

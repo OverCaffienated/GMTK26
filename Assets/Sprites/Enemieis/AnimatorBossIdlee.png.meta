@@ -1,13 +1,22 @@
 fileFormatVersion: 2
-guid: 21677d95f0194b140b591e9efe989a45
+guid: ff80289b2fa81a4498ed62af49a6ed2b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4948441389167606952
-    second: unsheatheparry_0
+      213: -1111201703950623859
+    second: AnimatorBossIdlee_0
   - first:
-      213: -3890455609010125244
-    second: unsheatheparry_1
+      213: 6123584506327609522
+    second: AnimatorBossIdlee_1
+  - first:
+      213: -7408053614295878140
+    second: AnimatorBossIdlee_2
+  - first:
+      213: -2376391288926694530
+    second: AnimatorBossIdlee_3
+  - first:
+      213: -8739955178777090134
+    second: AnimatorBossIdlee_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -116,45 +125,111 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: unsheatheparry_0
+      name: AnimatorBossIdlee_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 32
-        width: 32
-        height: 32
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: ef50782acda27c84fae97ac37d2c355d
-      internalID: -4948441389167606952
+      spriteID: d8bd63a00f73490f0800000000000000
+      internalID: -1111201703950623859
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: unsheatheparry_1
+      name: AnimatorBossIdlee_1
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 32
-        height: 32
+        x: 128
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 5c19e76fef4e1204ab395e0a836987f5
-      internalID: -3890455609010125244
+      spriteID: 2b03eb31aa75bf450800000000000000
+      internalID: 6123584506327609522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnimatorBossIdlee_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40678d2cc7e413990800000000000000
+      internalID: -7408053614295878140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnimatorBossIdlee_3
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e731130a6bc550fd0800000000000000
+      internalID: -2376391288926694530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnimatorBossIdlee_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa7e728321175b680800000000000000
+      internalID: -8739955178777090134
       vertices: []
       indices: 
       edges: []
@@ -163,7 +238,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 02b656d634c26044895701390abc6e3e
+    spriteID: 4dfb98a7f58816d48b5331084b1fab61
     internalID: 0
     vertices: []
     indices: 
@@ -173,10 +248,13 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":32.0,"y":32.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":128.0,"y":128.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      unsheatheparry_0: -4948441389167606952
-      unsheatheparry_1: -3890455609010125244
+      AnimatorBossIdlee_0: -1111201703950623859
+      AnimatorBossIdlee_1: 6123584506327609522
+      AnimatorBossIdlee_2: -7408053614295878140
+      AnimatorBossIdlee_3: -2376391288926694530
+      AnimatorBossIdlee_4: -8739955178777090134
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

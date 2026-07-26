@@ -62,6 +62,7 @@ public class PlayerCombatOrParry : MonoBehaviour
     public bool IsParryActive => isParryActive;
     public bool CanParry => Time.time >= nextParryTime && !isParryActive;
     public int CurrentLives => currentLives;
+    public bool IsAttacking { get; private set; }
 
     private void Start()
     {
@@ -148,6 +149,8 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     private IEnumerator AttackRoutine()
     {
+        IsAttacking = true;
+
         if (anim != null && !string.IsNullOrEmpty(attackAnimationName))
         {
             anim.Play(attackAnimationName, -1, 0f);
@@ -175,6 +178,8 @@ public class PlayerCombatOrParry : MonoBehaviour
         {
             anim.Play(idleAnimationName);
         }
+
+        IsAttacking = false;
     }
 
     private IEnumerator ActivateParryWindow()
