@@ -140,7 +140,7 @@ Transform:
   m_GameObject: {fileID: 2659970589552513116}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.455, y: -0.638, z: 0}
+  m_LocalPosition: {x: -0.248, y: -0.561, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -284,9 +284,9 @@ MonoBehaviour:
   strafeTimerMax: 2
   maxLeanAngle: 10
   leanSpeed: 8
-  enableLedgeCheck: 0
+  enableLedgeCheck: 1
   ledgeCheck: {fileID: 2627784246932676012}
-  ledgeCheckDistance: 1
+  ledgeCheckDistance: 2
   groundLayer:
     serializedVersion: 2
     m_Bits: 136

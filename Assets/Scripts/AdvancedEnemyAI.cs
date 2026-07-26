@@ -63,8 +63,13 @@ public class AdvancedEnemyAI : MonoBehaviour
     private bool canBeParriedNow = false;
     private float moveTimer = 0f;
     private bool wasAggroLastFrame = false;
-
     private int currentMoveDirection = 1;
+    private Rigidbody2D rb;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     private void Start()
     {
@@ -93,6 +98,7 @@ public class AdvancedEnemyAI : MonoBehaviour
 
         if (isAttacking || isPaused)
         {
+            if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             ApplyLeaning(0f);
             return;
         }
@@ -124,6 +130,7 @@ public class AdvancedEnemyAI : MonoBehaviour
             else
             {
                 ApplyLeaning(0f);
+                if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
                 StartCoroutine(AttackRoutine());
             }
         }
@@ -139,6 +146,23 @@ public class AdvancedEnemyAI : MonoBehaviour
             Vector3 scale = transform.localScale;
             scale.x = Mathf.Abs(scale.x) * sign;
             transform.localScale = scale;
+        }
+    }
+
+    private void PlayAnim(string animName, bool forceRestart = false)
+    {
+        if (anim == null || string.IsNullOrEmpty(animName)) return;
+        if (forceRestart)
+        {
+            anim.Play(animName, -1, 0f);
+        }
+        else
+        {
+            AnimatorStateInfo state = anim.GetCurrentAnimatorStateInfo(0);
+            if (!state.IsName(animName))
+            {
+                anim.Play(animName);
+            }
         }
     }
 
@@ -169,13 +193,16 @@ public class AdvancedEnemyAI : MonoBehaviour
         if (patrolDirection != 0)
         {
             UpdateFacing(patrolDirection);
-            transform.position += new Vector3(patrolDirection * patrolSpeed * Time.deltaTime, 0, 0);
-            if (anim != null && !string.IsNullOrEmpty(runAnimName)) anim.Play(runAnimName, -1, 0f);
+            if (rb != null) rb.linearVelocity = new Vector2(patrolDirection * patrolSpeed, rb.linearVelocity.y);
+            else transform.position += new Vector3(patrolDirection * patrolSpeed * Time.deltaTime, 0, 0);
+
+            PlayAnim(runAnimName);
             ApplyLeaning(patrolSpeed);
         }
         else
         {
-            if (anim != null && !string.IsNullOrEmpty(idleAnimName)) anim.Play(idleAnimName, -1, 0f);
+            if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            PlayAnim(idleAnimName);
             ApplyLeaning(0f);
         }
     }
@@ -188,46 +215,34 @@ public class AdvancedEnemyAI : MonoBehaviour
             PickNewMovementState();
         }
 
-        bool isLedgeAhead = false;
-        if (enableLedgeCheck && ledgeCheck != null && currentMoveDirection != 0)
-        {
-            int facingPlayerDir = player.transform.position.x > transform.position.x ? 1 : -1;
-            int actualMoveDir = facingPlayerDir * currentMoveDirection;
+        int facingPlayerDir = player.transform.position.x > transform.position.x ? 1 : -1;
+        int actualMoveDir = facingPlayerDir * currentMoveDirection;
 
+        bool isLedgeAhead = false;
+        if (enableLedgeCheck && ledgeCheck != null && actualMoveDir != 0)
+        {
             Vector3 checkPos = ledgeCheck.position + new Vector3(actualMoveDir * 0.5f, 0, 0);
             isLedgeAhead = !Physics2D.Raycast(checkPos, Vector2.down, ledgeCheckDistance, groundLayer);
         }
 
-        float actualSpeedToMove = moveSpeed;
         if (isLedgeAhead)
         {
             currentMoveDirection = 0;
-            actualSpeedToMove = 0f;
+            actualMoveDir = 0;
         }
 
-        if (currentMoveDirection == 1)
+        if (actualMoveDir != 0)
         {
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                new Vector2(player.transform.position.x, player.transform.position.y),
-                actualSpeedToMove * Time.deltaTime
-            );
-            if (anim != null && !string.IsNullOrEmpty(runAnimName)) anim.Play(runAnimName, -1, 0f);
-            ApplyLeaning(actualSpeedToMove);
-        }
-        else if (currentMoveDirection == -1)
-        {
-            Vector2 awayTarget = new Vector2(
-                transform.position.x + (transform.position.x > player.transform.position.x ? 1 : -1),
-                transform.position.y
-            );
-            transform.position = Vector2.MoveTowards(transform.position, awayTarget, actualSpeedToMove * Time.deltaTime);
-            if (anim != null && !string.IsNullOrEmpty(runAnimName)) anim.Play(runAnimName, -1, 0f);
-            ApplyLeaning(-actualSpeedToMove);
+            if (rb != null) rb.linearVelocity = new Vector2(actualMoveDir * moveSpeed, rb.linearVelocity.y);
+            else transform.position += new Vector3(actualMoveDir * moveSpeed * Time.deltaTime, 0, 0);
+
+            PlayAnim(runAnimName);
+            ApplyLeaning(actualMoveDir == facingPlayerDir ? moveSpeed : -moveSpeed);
         }
         else
         {
-            if (anim != null && !string.IsNullOrEmpty(idleAnimName)) anim.Play(idleAnimName, -1, 0f);
+            if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            PlayAnim(idleAnimName);
             ApplyLeaning(0f);
         }
     }
@@ -264,8 +279,7 @@ public class AdvancedEnemyAI : MonoBehaviour
             audioSource.PlayOneShot(attackSound);
         }
 
-        if (anim != null && !string.IsNullOrEmpty(attackAnimName))
-            anim.Play(attackAnimName, -1, 0f);
+        PlayAnim(attackAnimName, true);
 
         float windup = totalAttackDuration - parryWindowDuration;
         yield return new WaitForSeconds(windup);
@@ -293,8 +307,7 @@ public class AdvancedEnemyAI : MonoBehaviour
         isAttacking = false;
         isPaused = true;
 
-        if (anim != null && !string.IsNullOrEmpty(runAnimName))
-            anim.Play(runAnimName, -1, 0f);
+        PlayAnim(runAnimName);
 
         float pauseTime = Random.Range(minPauseBetweenAttacks, maxPauseBetweenAttacks);
         yield return new WaitForSeconds(pauseTime);
