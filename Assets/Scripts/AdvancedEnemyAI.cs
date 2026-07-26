@@ -38,6 +38,10 @@ public class AdvancedEnemyAI : MonoBehaviour
     [SerializeField] private int maxHealth = 3;
     private int currentHealth;
 
+    [Header("Death Settings")]
+    [SerializeField] private float sinkSpeed = 1.5f;
+    [SerializeField] private float sinkDuration = 2.0f;
+
     [Header("Detection & Patrol")]
     [SerializeField] private float aggroRadius = 7f;
     [SerializeField] private float patrolSpeed = 1.5f;
@@ -66,8 +70,8 @@ public class AdvancedEnemyAI : MonoBehaviour
     [SerializeField] private float parryWindowDuration = 0.25f;
     [SerializeField] private float minPauseBetweenAttacks = 0.5f;
     [SerializeField] private float maxPauseBetweenAttacks = 1.5f;
-    [SerializeField] private float minAttackSpeedBoost = 0.0f; // 0% faster
-    [SerializeField] private float maxAttackSpeedBoost = 0.15f; // 15% faster
+    [SerializeField] private float minAttackSpeedBoost = 0.0f;
+    [SerializeField] private float maxAttackSpeedBoost = 0.15f;
 
     [Header("Tank / Expert Settings")]
     [SerializeField] private string stunAnimName = "EnemyStun";
@@ -86,8 +90,10 @@ public class AdvancedEnemyAI : MonoBehaviour
     private Rigidbody2D rb;
 
     private bool isStunned = false;
+    private bool isDead = false;
     private int currentParriesReceived = 0;
     private float expertParryTimer = 0f;
+    private float parryDebounceTimer = 0f;
 
     private void Awake()
     {
@@ -108,9 +114,10 @@ public class AdvancedEnemyAI : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
+        if (player == null || isDead) return;
 
         if (expertParryTimer > 0f) expertParryTimer -= Time.deltaTime;
+        if (parryDebounceTimer > 0f) parryDebounceTimer -= Time.deltaTime;
 
         if (archetype == EnemyType.Expert && !isStunned && !isAttacking && !isPaused)
         {
@@ -126,11 +133,12 @@ public class AdvancedEnemyAI : MonoBehaviour
             }
         }
 
-        if (canBeParriedNow)
+        if (canBeParriedNow && parryDebounceTimer <= 0f)
         {
             PlayerCombatOrParry pc = player.GetComponent<PlayerCombatOrParry>();
             if (pc != null && pc.IsParryActive)
             {
+                parryDebounceTimer = 0.2f;
                 SuccessfulParry(pc);
                 return;
             }
@@ -310,6 +318,18 @@ public class AdvancedEnemyAI : MonoBehaviour
         else currentMoveDirection = 0;
     }
 
+    private IEnumerator ExpertWeaponRoutine(float delay, float speedMod)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (isAttacking && attackHitboxObject != null && !isStunned && !isDead)
+        {
+            attackHitboxObject.SetActive(true);
+            Animator weaponAnim = attackHitboxObject.GetComponent<Animator>();
+            if (weaponAnim != null) weaponAnim.speed = speedMod;
+        }
+    }
+
     private IEnumerator AttackRoutine()
     {
         isAttacking = true;
@@ -319,13 +339,17 @@ public class AdvancedEnemyAI : MonoBehaviour
             audioSource.PlayOneShot(attackSound);
         }
 
-        // Calculate Random Speed Boost
         float speedMod = 1f + Random.Range(minAttackSpeedBoost, maxAttackSpeedBoost);
         if (anim != null) anim.speed = speedMod;
 
         PlayAnim(attackAnimName, true);
 
-        // Adjust timings to match the new animation speed perfectly
+        if (archetype == EnemyType.Expert)
+        {
+            float expertDelay = 0.2f / speedMod;
+            StartCoroutine(ExpertWeaponRoutine(expertDelay, speedMod));
+        }
+
         float currentTotal = totalAttackDuration / speedMod;
         float currentParry = parryWindowDuration / speedMod;
         float windup = currentTotal - currentParry;
@@ -334,10 +358,10 @@ public class AdvancedEnemyAI : MonoBehaviour
 
         canBeParriedNow = true;
         if (glintParticle != null) glintParticle.SetActive(true);
-        if (attackHitboxObject != null)
+
+        if (archetype != EnemyType.Expert && attackHitboxObject != null)
         {
             attackHitboxObject.SetActive(true);
-            // Ensure the weapon animation speeds up to match the body!
             Animator weaponAnim = attackHitboxObject.GetComponent<Animator>();
             if (weaponAnim != null) weaponAnim.speed = speedMod;
         }
@@ -350,10 +374,10 @@ public class AdvancedEnemyAI : MonoBehaviour
         {
             attackHitboxObject.SetActive(false);
             Animator weaponAnim = attackHitboxObject.GetComponent<Animator>();
-            if (weaponAnim != null) weaponAnim.speed = 1f; // Reset weapon speed
+            if (weaponAnim != null) weaponAnim.speed = 1f;
         }
 
-        if (anim != null) anim.speed = 1f; // Reset body speed
+        if (anim != null) anim.speed = 1f;
 
         if (isAttacking)
         {
@@ -411,10 +435,10 @@ public class AdvancedEnemyAI : MonoBehaviour
         {
             attackHitboxObject.SetActive(false);
             Animator weaponAnim = attackHitboxObject.GetComponent<Animator>();
-            if (weaponAnim != null) weaponAnim.speed = 1f; // Reset weapon speed on parry
+            if (weaponAnim != null) weaponAnim.speed = 1f;
         }
 
-        if (anim != null) anim.speed = 1f; // Reset body speed on parry
+        if (anim != null) anim.speed = 1f;
 
         pc.TriggerParryEffect();
         pc.ApplyParryPushback(transform.position);
@@ -425,6 +449,8 @@ public class AdvancedEnemyAI : MonoBehaviour
         if (archetype == EnemyType.Tank || archetype == EnemyType.Expert)
         {
             currentParriesReceived++;
+            Debug.Log("Parry Successful! Current Count: " + currentParriesReceived + " / Required: " + requiredParriesToStun);
+
             if (currentParriesReceived >= requiredParriesToStun)
             {
                 currentParriesReceived = 0;
@@ -476,6 +502,8 @@ public class AdvancedEnemyAI : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
+        if (isDead) return;
+
         if (archetype == EnemyType.Tank || archetype == EnemyType.Expert)
         {
             if (!isStunned)
@@ -498,7 +526,35 @@ public class AdvancedEnemyAI : MonoBehaviour
         if (currentHealth <= 0)
         {
             StopAllCoroutines();
-            Destroy(gameObject);
+            StartCoroutine(DeathRoutine());
         }
+    }
+
+    private IEnumerator DeathRoutine()
+    {
+        isDead = true;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.isKinematic = true;
+            rb.simulated = false;
+        }
+
+        if (glintParticle != null) glintParticle.SetActive(false);
+        if (attackHitboxObject != null) attackHitboxObject.SetActive(false);
+        if (expertGlintParticle != null) expertGlintParticle.SetActive(false);
+
+        if (anim != null) anim.speed = 0f;
+
+        float timer = 0f;
+        while (timer < sinkDuration)
+        {
+            transform.position += Vector3.down * sinkSpeed * Time.deltaTime;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 }

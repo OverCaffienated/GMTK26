@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: fed5a76cd4d1e0a41aca18aed46e27a9
+guid: 76e9f94a0438c184aa3d9005e39c1e63
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5140530723760886371
-    second: endingblade_0
+      213: 3365826848552427552
+    second: BlueGlint_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,30 +109,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: endingblade_0
+      name: BlueGlint_0
       rect:
         serializedVersion: 2
-        x: 5
-        y: 33
-        width: 114
-        height: 95
+        x: 47
+        y: 49
+        width: 32
+        height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d9d204dda8a29a8b0800000000000000
-      internalID: -5140530723760886371
+      spriteID: 020a0739fa1d5be20800000000000000
+      internalID: 3365826848552427552
       vertices: []
       indices: 
       edges: []
@@ -161,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      endingblade_0: -5140530723760886371
+      BlueGlint_0: 3365826848552427552
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
