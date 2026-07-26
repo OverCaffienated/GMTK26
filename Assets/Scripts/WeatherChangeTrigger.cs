@@ -93,10 +93,15 @@ public class WeatherChangeTrigger : MonoBehaviour
 
         Color cloudColor = Color.white;
         float startCloudAlpha = 0f;
+
         if (cloudsBackground != null)
         {
             cloudColor = cloudsBackground.color;
-            startCloudAlpha = cloudColor.a;
+            cloudColor.a = 0f;
+            cloudsBackground.color = cloudColor;
+            cloudsBackground.gameObject.SetActive(true);
+
+            startCloudAlpha = 0f;
         }
 
         float[] startRainRates = new float[rainParticleSystems.Length];

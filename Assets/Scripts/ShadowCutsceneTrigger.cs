@@ -23,18 +23,30 @@ public class ShadowCutsceneTrigger : MonoBehaviour
     [SerializeField] private SpriteRenderer playerSpriteRenderer;
     [SerializeField] private Sprite customCutsceneSprite;
 
+    [Header("Player Speed Settings")]
+    [SerializeField] private float cutsceneMoveSpeed = 2f;
+    [SerializeField] private float postCutsceneMoveSpeed = 8f;
+
     [Header("Timing")]
     [SerializeField] private float fadeInDuration = 2.0f;
     [SerializeField] private float holdDuration = 1.5f;
     [SerializeField] private float fadeOutDuration = 2.0f;
 
     private bool hasTriggered = false;
+    private PlayerController2D playerController;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!hasTriggered && collision.CompareTag("Player"))
         {
             hasTriggered = true;
+
+            // Grab the player controller and slow them down
+            playerController = collision.GetComponent<PlayerController2D>();
+            if (playerController != null)
+            {
+                playerController.SetMoveSpeed(cutsceneMoveSpeed);
+            }
 
             if (shadowObject != null)
             {
@@ -150,6 +162,12 @@ public class ShadowCutsceneTrigger : MonoBehaviour
         if (GameStateManager.Instance != null)
         {
             GameStateManager.Instance.GameplayLocked = false;
+        }
+
+        // Restore the player's normal speed after the cutscene finishes!
+        if (playerController != null)
+        {
+            playerController.SetMoveSpeed(postCutsceneMoveSpeed);
         }
     }
 }

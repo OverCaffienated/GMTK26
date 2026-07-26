@@ -8,7 +8,6 @@ public class ShadowPlayback : MonoBehaviour
     [SerializeField] private Animator shadowAnim;
     [SerializeField] private GameObject glintParticle;
     [SerializeField] private GameObject attackHitboxObject;
-    [SerializeField] private string permanentDeathSceneName = "GuillotineDeathScene";
 
     [Header("Audio")]
     [SerializeField] private AudioSource tickingAudioSource;
@@ -258,8 +257,11 @@ public class ShadowPlayback : MonoBehaviour
 
         if (isAttacking)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(permanentDeathSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
-            Time.timeScale = 0f;
+            PlayerCombatOrParry playerCombat = player.GetComponent<PlayerCombatOrParry>();
+            if (playerCombat != null)
+            {
+                playerCombat.TakeDamage(999);
+            }
         }
 
         isAttacking = false;
