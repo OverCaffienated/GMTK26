@@ -41,7 +41,6 @@ public class ShadowCutsceneTrigger : MonoBehaviour
         {
             hasTriggered = true;
 
-            // Grab the player controller and slow them down
             playerController = collision.GetComponent<PlayerController2D>();
             if (playerController != null)
             {
@@ -164,7 +163,6 @@ public class ShadowCutsceneTrigger : MonoBehaviour
             GameStateManager.Instance.GameplayLocked = false;
         }
 
-        // Restore the player's normal speed after the cutscene finishes!
         if (playerController != null)
         {
             playerController.SetMoveSpeed(postCutsceneMoveSpeed);

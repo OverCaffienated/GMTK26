@@ -265,6 +265,12 @@ MonoBehaviour:
   glintParticle: {fileID: 5493329877646953663}
   attackHitboxObject: {fileID: 4941504008800957054}
   visualRoot: {fileID: 0}
+  audioSource: {fileID: 0}
+  attackSound: {fileID: 0}
+  aggroGruntSound: {fileID: 0}
+  gruntVolume: 1
+  damageTakenSound: {fileID: 8300000, guid: 04b0d6117c704964a8b2b884b4ce20e6, type: 3}
+  damageTakenVolume: 0.722
   runAnimName: EnemyRun
   idleAnimName: EnemyRun
   attackAnimName: EnemyAttack

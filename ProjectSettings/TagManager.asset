@@ -60,6 +60,9 @@ TagManager:
   - name: Objects
     uniqueID: 2649298853
     locked: 0
+  - name: Sunray
+    uniqueID: 1817707645
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

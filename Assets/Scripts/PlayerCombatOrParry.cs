@@ -15,6 +15,7 @@ public class PlayerCombatOrParry : MonoBehaviour
     [SerializeField] private float parryDuration = 0.2f;
     [SerializeField] private float parryCooldown = 5.0f;
     [SerializeField] private float parryPushbackDistance = 0.3f;
+    [SerializeField] private float playerParryPushbackForce = 12f;
     [SerializeField] private GameObject parryEffectPrefab;
     [SerializeField] private float parryShakeDuration = 0.2f;
     [SerializeField] private float parryShakeIntensity = 0.3f;
@@ -233,10 +234,13 @@ public class PlayerCombatOrParry : MonoBehaviour
 
     public void ApplyParryPushback(Vector3 attackerPosition)
     {
-        StringPushbackCheck();
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            float pushDirection = transform.position.x < attackerPosition.x ? -1f : 1f;
+            rb.linearVelocity = new Vector2(pushDirection * playerParryPushbackForce, rb.linearVelocity.y);
+        }
     }
-
-    private void StringPushbackCheck() { }
 
     public void TakeDamage(int damage)
     {

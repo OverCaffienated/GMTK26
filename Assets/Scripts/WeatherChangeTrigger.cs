@@ -12,6 +12,12 @@ public class WeatherChangeTrigger : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private SpriteRenderer cloudsBackground;
     [SerializeField] private GameObject shadowObject;
+    [SerializeField] private CanvasGroup uiCanvasGroup;
+
+    [Header("Sunrays Settings")]
+    [SerializeField] private Light2D[] sunrays;
+    [SerializeField] private float sunrayFadeDuration = 2.0f;
+    [SerializeField] private float targetSunrayIntensity = 1.0f;
 
     [Header("Audio Fade References")]
     [SerializeField] private AudioSource rainAudioSource;
@@ -27,6 +33,7 @@ public class WeatherChangeTrigger : MonoBehaviour
     [SerializeField] private Color newSkyColor = new Color(0.85f, 0.9f, 0.7f);
     [SerializeField] private float newLightIntensity = 1.2f;
     [SerializeField] private float targetCloudAlpha = 1f;
+    [SerializeField] private float targetCameraZoomSize = 1.5f;
 
     [Header("Post-Processing Settings")]
     [SerializeField] private float targetVignetteIntensity = 0f;
@@ -37,6 +44,20 @@ public class WeatherChangeTrigger : MonoBehaviour
     [SerializeField] private float newJumpHeight = 5f;
 
     private bool hasTriggered = false;
+
+    private void Start()
+    {
+        if (sunrays != null)
+        {
+            foreach (Light2D ray in sunrays)
+            {
+                if (ray != null)
+                {
+                    ray.intensity = 0f;
+                }
+            }
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -65,6 +86,15 @@ public class WeatherChangeTrigger : MonoBehaviour
                 randomAmbientSFXObject.SetActive(true);
             }
 
+            if (mainCamera != null)
+            {
+                DynamicCameraZoom dynZoom = mainCamera.GetComponent<DynamicCameraZoom>();
+                if (dynZoom != null)
+                {
+                    dynZoom.enabled = false;
+                }
+            }
+
             StartCoroutine(WeatherTransitionRoutine());
         }
     }
@@ -76,6 +106,8 @@ public class WeatherChangeTrigger : MonoBehaviour
         Color startLightColor = globalLight != null ? globalLight.color : Color.white;
         float startIntensity = globalLight != null ? globalLight.intensity : 1f;
         Color startCamColor = mainCamera != null ? mainCamera.backgroundColor : Color.black;
+        float startCamSize = mainCamera != null ? mainCamera.orthographicSize : 2f;
+        float startUIAlpha = uiCanvasGroup != null ? uiCanvasGroup.alpha : 1f;
 
         float startRainVolume = rainAudioSource != null ? rainAudioSource.volume : 1f;
 
@@ -99,6 +131,7 @@ public class WeatherChangeTrigger : MonoBehaviour
             cloudColor = cloudsBackground.color;
             cloudColor.a = 0f;
             cloudsBackground.color = cloudColor;
+
             cloudsBackground.gameObject.SetActive(true);
 
             startCloudAlpha = 0f;
@@ -151,6 +184,12 @@ public class WeatherChangeTrigger : MonoBehaviour
             if (mainCamera != null)
             {
                 mainCamera.backgroundColor = Color.Lerp(startCamColor, newSkyColor, percent);
+                mainCamera.orthographicSize = Mathf.Lerp(startCamSize, targetCameraZoomSize, percent);
+            }
+
+            if (uiCanvasGroup != null)
+            {
+                uiCanvasGroup.alpha = Mathf.Lerp(startUIAlpha, 0f, percent);
             }
 
             if (rainAudioSource != null)
@@ -193,7 +232,17 @@ public class WeatherChangeTrigger : MonoBehaviour
             globalLight.color = newSkyColor;
             globalLight.intensity = newLightIntensity;
         }
-        if (mainCamera != null) mainCamera.backgroundColor = newSkyColor;
+        if (mainCamera != null)
+        {
+            mainCamera.backgroundColor = newSkyColor;
+            mainCamera.orthographicSize = targetCameraZoomSize;
+        }
+
+        if (uiCanvasGroup != null)
+        {
+            uiCanvasGroup.alpha = 0f;
+            uiCanvasGroup.gameObject.SetActive(false);
+        }
 
         if (rainAudioSource != null)
         {
@@ -221,5 +270,35 @@ public class WeatherChangeTrigger : MonoBehaviour
 
         if (vignette != null) vignette.intensity.value = targetVignetteIntensity;
         if (bloom != null) bloom.intensity.value = targetBloomIntensity;
+
+        float rayTimeElapsed = 0f;
+        while (rayTimeElapsed < sunrayFadeDuration)
+        {
+            rayTimeElapsed += Time.deltaTime;
+            float percent = rayTimeElapsed / sunrayFadeDuration;
+
+            if (sunrays != null)
+            {
+                foreach (Light2D ray in sunrays)
+                {
+                    if (ray != null)
+                    {
+                        ray.intensity = Mathf.Lerp(0f, targetSunrayIntensity, percent);
+                    }
+                }
+            }
+            yield return null;
+        }
+
+        if (sunrays != null)
+        {
+            foreach (Light2D ray in sunrays)
+            {
+                if (ray != null)
+                {
+                    ray.intensity = targetSunrayIntensity;
+                }
+            }
+        }
     }
 }

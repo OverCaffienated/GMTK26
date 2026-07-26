@@ -167,7 +167,6 @@ public class ShadowPlayback : MonoBehaviour
         isAttacking = true;
         attackTimer = 0f;
 
-        // 1. Play Body Attack Animation & Sound
         if (shadowAnim != null && !string.IsNullOrEmpty(bodyAttackAnimName))
         {
             shadowAnim.Play(bodyAttackAnimName, -1, 0f);
@@ -192,7 +191,6 @@ public class ShadowPlayback : MonoBehaviour
             yield return null;
         }
 
-        // 2. Summon the Clock Hitbox & Play Clock Sound
         if (attackHitboxObject != null)
         {
             attackHitboxObject.SetActive(true);

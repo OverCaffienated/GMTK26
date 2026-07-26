@@ -19,6 +19,9 @@ public class LevelEndTrigger : MonoBehaviour
     [SerializeField] private Sprite secondSprite;
     [SerializeField] private float delayBeforeSecondSprite = 2.0f;
 
+    [Header("Player Physics")]
+    [SerializeField] private PhysicsMaterial2D maxFrictionMaterial;
+
     private bool hasTriggered = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -41,6 +44,17 @@ public class LevelEndTrigger : MonoBehaviour
         if (playerMovement != null)
         {
             playerMovement.enabled = false;
+        }
+
+        Rigidbody2D rb = collision.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+
+            if (maxFrictionMaterial != null)
+            {
+                rb.sharedMaterial = maxFrictionMaterial;
+            }
         }
 
         if (playerAnimator != null)

@@ -126,6 +126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4950600288386167202}
   - component: {fileID: 1331342181132442798}
+  - component: {fileID: 1853947265474829040}
   m_Layer: 0
   m_Name: LampLight
   m_TagString: Untagged
@@ -221,3 +222,20 @@ MonoBehaviour:
       type: {class: 'Provider2DCache`1[[UnityEngine.Rendering.Universal.Light2DProvider, Unity.RenderPipelines.Universal.2D.Runtime]]', ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data:
         m_Cache: []
+--- !u!114 &1853947265474829040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8583715545613952332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64efe30a54741934fb4ae1598cdd7062, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RandomLightFlicker
+  targetLight: {fileID: 0}
+  minIntensity: 1.2
+  maxIntensity: 2.1
+  minFlickerSpeed: 0.05
+  maxFlickerSpeed: 0.2

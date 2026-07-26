@@ -157,7 +157,7 @@ public class AdvancedEnemyAI : MonoBehaviour
         bool isLedgeAhead = false;
         if (enableLedgeCheck && ledgeCheck != null && patrolDirection != 0)
         {
-            Vector3 checkPos = transform.position + new Vector3(patrolDirection * 0.5f, 0, 0);
+            Vector3 checkPos = ledgeCheck.position + new Vector3(patrolDirection * 0.5f, 0, 0);
             isLedgeAhead = !Physics2D.Raycast(checkPos, Vector2.down, ledgeCheckDistance, groundLayer);
         }
 
@@ -194,7 +194,7 @@ public class AdvancedEnemyAI : MonoBehaviour
             int facingPlayerDir = player.transform.position.x > transform.position.x ? 1 : -1;
             int actualMoveDir = facingPlayerDir * currentMoveDirection;
 
-            Vector3 checkPos = transform.position + new Vector3(actualMoveDir * 0.5f, 0, 0);
+            Vector3 checkPos = ledgeCheck.position + new Vector3(actualMoveDir * 0.5f, 0, 0);
             isLedgeAhead = !Physics2D.Raycast(checkPos, Vector2.down, ledgeCheckDistance, groundLayer);
         }
 
@@ -320,10 +320,6 @@ public class AdvancedEnemyAI : MonoBehaviour
     {
         isAttacking = false;
         isPaused = true;
-
-        Vector2 pushDir = ((Vector2)transform.position - (Vector2)player.transform.position).normalized;
-        if (pushDir == Vector2.zero) pushDir = Vector2.right;
-        transform.position += (Vector3)(pushDir * 1.5f);
 
         yield return new WaitForSeconds(2.0f);
 
